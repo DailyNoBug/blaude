@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+import { createRequire as __blaudeCreateRequire } from "module";
+const require = __blaudeCreateRequire(import.meta.url);
+import "./chunk-O5PZ3G6I.mjs";
+
+// src/assistant/sessionDiscovery.ts
+async function discoverAssistantSessions() {
+  return [];
+}
+export {
+  discoverAssistantSessions
+};
+//# sourceMappingURL=data:application/json;base64,ewogICJ2ZXJzaW9uIjogMywKICAic291cmNlcyI6IFsiLi4vLi4vc3JjL2Fzc2lzdGFudC9zZXNzaW9uRGlzY292ZXJ5LnRzIl0sCiAgInNvdXJjZXNDb250ZW50IjogWyJleHBvcnQgdHlwZSBBc3Npc3RhbnRTZXNzaW9uID0ge1xuICBpZDogc3RyaW5nXG4gIHRpdGxlPzogc3RyaW5nXG59XG5cbmV4cG9ydCBhc3luYyBmdW5jdGlvbiBkaXNjb3ZlckFzc2lzdGFudFNlc3Npb25zKCk6IFByb21pc2U8QXNzaXN0YW50U2Vzc2lvbltdPiB7XG4gIHJldHVybiBbXVxufVxuIl0sCiAgIm1hcHBpbmdzIjogIjs7Ozs7O0FBS0EsZUFBc0IsNEJBQXlEO0FBQzdFLFNBQU8sQ0FBQztBQUNWOyIsCiAgIm5hbWVzIjogW10KfQo=

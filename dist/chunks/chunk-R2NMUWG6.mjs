@@ -1,0 +1,21 @@
+#!/usr/bin/env node
+import { createRequire as __blaudeCreateRequire } from "module";
+const require = __blaudeCreateRequire(import.meta.url);
+import {
+  __esm
+} from "./chunk-O5PZ3G6I.mjs";
+
+// src/utils/worktreeModeEnabled.ts
+function isWorktreeModeEnabled() {
+  return true;
+}
+var init_worktreeModeEnabled = __esm({
+  "src/utils/worktreeModeEnabled.ts"() {
+  }
+});
+
+export {
+  isWorktreeModeEnabled,
+  init_worktreeModeEnabled
+};
+//# sourceMappingURL=data:application/json;base64,ewogICJ2ZXJzaW9uIjogMywKICAic291cmNlcyI6IFsiLi4vLi4vc3JjL3V0aWxzL3dvcmt0cmVlTW9kZUVuYWJsZWQudHMiXSwKICAic291cmNlc0NvbnRlbnQiOiBbIi8qKlxuICogV29ya3RyZWUgbW9kZSBpcyBub3cgdW5jb25kaXRpb25hbGx5IGVuYWJsZWQgZm9yIGFsbCB1c2Vycy5cbiAqXG4gKiBQcmV2aW91c2x5IGdhdGVkIGJ5IEdyb3d0aEJvb2sgZmxhZyAndGVuZ3Vfd29ya3RyZWVfbW9kZScsIGJ1dCB0aGVcbiAqIENBQ0hFRF9NQVlfQkVfU1RBTEUgcGF0dGVybiByZXR1cm5zIHRoZSBkZWZhdWx0IChmYWxzZSkgb24gZmlyc3QgbGF1bmNoXG4gKiBiZWZvcmUgdGhlIGNhY2hlIGlzIHBvcHVsYXRlZCwgc2lsZW50bHkgc3dhbGxvd2luZyAtLXdvcmt0cmVlLlxuICogU2VlIGh0dHBzOi8vZ2l0aHViLmNvbS9hbnRocm9waWNzL2NsYXVkZS1jb2RlL2lzc3Vlcy8yNzA0NC5cbiAqL1xuZXhwb3J0IGZ1bmN0aW9uIGlzV29ya3RyZWVNb2RlRW5hYmxlZCgpOiBib29sZWFuIHtcbiAgcmV0dXJuIHRydWVcbn1cbiJdLAogICJtYXBwaW5ncyI6ICI7Ozs7Ozs7O0FBUU8sU0FBUyx3QkFBaUM7QUFDL0MsU0FBTztBQUNUO0FBVkE7QUFBQTtBQUFBO0FBQUE7IiwKICAibmFtZXMiOiBbXQp9Cg==

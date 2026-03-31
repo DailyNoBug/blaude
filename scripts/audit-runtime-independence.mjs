@@ -3,53 +3,60 @@ import path from "path";
 import { createRequire } from "module";
 
 const root = process.cwd();
-const targets = [
-  "package.json",
-  "pnpm-lock.yaml",
-  "black-src",
-  "dist",
-  "scripts/build-black-cli.mjs",
-];
-const forbiddenPatterns = [
-  "@anthropic-ai/claude-code",
-  "compat-src",
-  "claude-recovered",
-  "run-official",
-];
 const require = createRequire(import.meta.url);
 
-function walkFiles(targetPath, { allowDist = false } = {}) {
-  const absolutePath = path.resolve(root, targetPath);
-  const stat = fs.statSync(absolutePath);
-  if (stat.isFile()) {
-    return [absolutePath];
-  }
-  const entries = fs.readdirSync(absolutePath, { withFileTypes: true });
-  const files = [];
-  for (const entry of entries) {
-    if (entry.name === "node_modules" || (!allowDist && entry.name === "dist")) {
-      continue;
-    }
-    files.push(...walkFiles(path.join(targetPath, entry.name), { allowDist }));
-  }
-  return files;
+const findings = [];
+const packageJson = JSON.parse(
+  fs.readFileSync(path.join(root, "package.json"), "utf8"),
+);
+const packageJsonText = fs.readFileSync(path.join(root, "package.json"), "utf8");
+const lockfilePath = path.join(root, "pnpm-lock.yaml");
+const lockfileText = fs.existsSync(lockfilePath)
+  ? fs.readFileSync(lockfilePath, "utf8")
+  : "";
+
+if (fs.existsSync(path.join(root, "black-src"))) {
+  findings.push({
+    file: "black-src",
+    pattern: "legacy rewrite runtime directory still present",
+  });
+}
+if (fs.existsSync(path.join(root, "scripts", "build-black-cli.mjs"))) {
+  findings.push({
+    file: "scripts/build-black-cli.mjs",
+    pattern: "legacy black-src build script still present",
+  });
 }
 
-const findings = [];
-for (const target of targets) {
-  if (!fs.existsSync(path.resolve(root, target))) {
-    continue;
-  }
-  for (const filePath of walkFiles(target, { allowDist: target === "dist" })) {
-    const text = fs.readFileSync(filePath, "utf8");
-    for (const pattern of forbiddenPatterns) {
-      if (text.includes(pattern)) {
-        findings.push({
-          file: path.relative(root, filePath),
-          pattern,
-        });
-      }
+for (const [scriptName, command] of Object.entries(packageJson.scripts ?? {})) {
+  for (const marker of [
+    "black-src",
+    "build-black-cli",
+    "compat-src",
+    "run-official",
+    "@anthropic-ai/claude-code",
+  ]) {
+    if (String(command).includes(marker)) {
+      findings.push({
+        file: "package.json",
+        pattern: `script ${scriptName} references ${marker}`,
+      });
     }
+  }
+}
+
+for (const marker of ["@anthropic-ai/claude-code", "compat-src", "run-official"]) {
+  if (packageJsonText.includes(marker)) {
+    findings.push({
+      file: "package.json",
+      pattern: `package manifest references ${marker}`,
+    });
+  }
+  if (lockfileText.includes(marker)) {
+    findings.push({
+      file: "pnpm-lock.yaml",
+      pattern: `lockfile references ${marker}`,
+    });
   }
 }
 

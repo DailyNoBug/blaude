@@ -1,0 +1,12 @@
+#!/usr/bin/env node
+import { createRequire as __blaudeCreateRequire } from "module";
+const require = __blaudeCreateRequire(import.meta.url);
+import "./chunk-O5PZ3G6I.mjs";
+
+// src/server/connectHeadless.ts
+async function runConnectHeadless(_connectConfig, _prompt, _outputFormat, _interactive) {
+}
+export {
+  runConnectHeadless
+};
+//# sourceMappingURL=data:application/json;base64,ewogICJ2ZXJzaW9uIjogMywKICAic291cmNlcyI6IFsiLi4vLi4vc3JjL3NlcnZlci9jb25uZWN0SGVhZGxlc3MudHMiXSwKICAic291cmNlc0NvbnRlbnQiOiBbImV4cG9ydCBhc3luYyBmdW5jdGlvbiBydW5Db25uZWN0SGVhZGxlc3MoXG4gIF9jb25uZWN0Q29uZmlnOiB1bmtub3duLFxuICBfcHJvbXB0OiBzdHJpbmcsXG4gIF9vdXRwdXRGb3JtYXQ6IHVua25vd24sXG4gIF9pbnRlcmFjdGl2ZTogYm9vbGVhbixcbik6IFByb21pc2U8dm9pZD4ge31cbiJdLAogICJtYXBwaW5ncyI6ICI7Ozs7OztBQUFBLGVBQXNCLG1CQUNwQixnQkFDQSxTQUNBLGVBQ0EsY0FDZTtBQUFDOyIsCiAgIm5hbWVzIjogW10KfQo=

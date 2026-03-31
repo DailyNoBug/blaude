@@ -197,6 +197,7 @@ type State = {
   mainThreadAgentType: string | undefined
   // Remote mode (--remote flag)
   isRemoteMode: boolean
+  replBridgeActive?: boolean
   // Direct connect server URL (for display in header)
   directConnectServerUrl: string | undefined
   // System prompt section cache state
@@ -534,6 +535,10 @@ export function setCwdState(cwd: string): void {
 
 export function getDirectConnectServerUrl(): string | undefined {
   return STATE.directConnectServerUrl
+}
+
+export function isReplBridgeActive(): boolean {
+  return STATE.replBridgeActive === true
 }
 
 export function setDirectConnectServerUrl(url: string): void {
@@ -1755,4 +1760,3 @@ export function getPromptId(): string | null {
 export function setPromptId(id: string | null): void {
   STATE.promptId = id
 }
-

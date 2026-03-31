@@ -1,11 +1,11 @@
 # Blaude
 
-`Blaude` is the independent CLI/TUI runtime in this repository. It is a local rewrite and modification derived from the `2026-03-31` leaked Claude Code source tree, but it no longer depends on the official `@anthropic-ai/claude-code` npm package to build or run.
+`Blaude` is the independent CLI/TUI runtime in this repository. It is modified from the `2026-03-31` leaked Claude Code source tree, and the runnable core now builds from the leaked `src/` tree plus local compatibility shims instead of the official `@anthropic-ai/claude-code` npm package.
 
 This repository contains:
 
 - the leaked `src/` tree from the `2026-03-31` Claude Code leak
-- the active in-repo rewrite runtime under `black-src/`
+- local compatibility shims and build helpers that make the leaked `src/` runtime executable under Node
 
 The executable command exposed by this project is now:
 
@@ -31,7 +31,7 @@ What Blaude already provides:
 
 What it is not:
 
-- not a byte-for-byte rebuild of the leaked Claude Code source
+- not a byte-for-byte rebuild of the leaked Claude Code source snapshot
 - not yet full parity with the latest official Claude Code
 - not dependent on the official Claude Code npm package
 
@@ -60,8 +60,8 @@ This rewrite was modified from the Claude Code `20260331` leaked source snapshot
 Concretely:
 
 - the leaked source tree remains in `src/`
-- the runnable runtime is the rewrite in `black-src/`
-- packaging, startup, TUI behavior, and provider wiring have been reworked locally
+- the runnable runtime is now bundled from `src/entrypoints/cli.tsx`
+- packaging, startup, missing-module shims, and provider wiring have been reworked locally
 
 ## Build From Source
 
@@ -85,8 +85,8 @@ pnpm run build
 
 This creates:
 
-- `dist/black-src/`
 - `dist/blaude.mjs`
+- `dist/chunks/`
 
 4. Verify the active runtime is independent from the official Claude Code package:
 
@@ -278,7 +278,7 @@ If an older `.claude/black-code/` directory exists, Blaude will copy legacy stat
 
 ## Independence Guarantees
 
-The active runtime is the rewrite in `black-src/`, not the official package.
+The active runtime is the leaked `src/` runtime bundled with local Node-compatibility shims, not the official package.
 
 The audit checks:
 
@@ -296,14 +296,13 @@ pnpm run audit:runtime
 ## Repository Layout
 
 ```text
-black-src/   active Blaude runtime
 dist/        built runtime output
-scripts/     build and audit helpers
-src/         leaked Claude Code source snapshot
+scripts/     build, audit, and compatibility helpers
+src/         leaked Claude Code source snapshot and active runtime core
 ```
 
 ## Notes
 
 - The current version string is still `99.99.99-black.1` by design.
-- Internal source folder names still use `black-src/` for continuity, but the runnable product name is `Blaude`.
+- The current runnable core is the leaked `src/` tree, with compatibility layers living under `scripts/` and selected supplemental `src/` modules.
 - The latest user guide lives in [USER_GUIDE.md](./USER_GUIDE.md).

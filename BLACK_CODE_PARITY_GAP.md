@@ -24,7 +24,7 @@ Notes:
 
 Implemented now:
 
-- independent runtime in `black-src/`
+- independent runtime built from the leaked `src/` tree with compatibility shims
 - no runtime dependency on `@anthropic-ai/claude-code`
 - clean build that removes stale `dist/` artifacts before copying the active runtime
 - runtime independence audit across `package.json`, `pnpm-lock.yaml`, `dist/`, and installed `node_modules/`
@@ -68,8 +68,8 @@ Implemented now:
 What is true today:
 
 - Blaude no longer depends on the official `@anthropic-ai/claude-code` npm package to build or run.
-- The active runtime is the in-repo rewrite under `black-src/`.
-- The leaked `src/` tree is still incomplete and is not yet the executable runtime.
+- The active runtime is bundled from the leaked `src/` tree.
+- The leaked `src/` tree still needs local compatibility shims and supplemental modules to execute under Node.
 
 What is not true today:
 

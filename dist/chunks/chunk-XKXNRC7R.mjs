@@ -1,0 +1,62 @@
+#!/usr/bin/env node
+import { createRequire as __blaudeCreateRequire } from "module";
+const require = __blaudeCreateRequire(import.meta.url);
+import {
+  client_exports,
+  init_client
+} from "./chunk-MTY4OASM.mjs";
+import {
+  require_dist_cjs
+} from "./chunk-NE3ECB5D.mjs";
+import {
+  __commonJS,
+  __toCommonJS
+} from "./chunk-O5PZ3G6I.mjs";
+
+// node_modules/.pnpm/@aws-sdk+credential-provider-env@3.972.24/node_modules/@aws-sdk/credential-provider-env/dist-cjs/index.js
+var require_dist_cjs2 = __commonJS({
+  "node_modules/.pnpm/@aws-sdk+credential-provider-env@3.972.24/node_modules/@aws-sdk/credential-provider-env/dist-cjs/index.js"(exports) {
+    var client = (init_client(), __toCommonJS(client_exports));
+    var propertyProvider = require_dist_cjs();
+    var ENV_KEY = "AWS_ACCESS_KEY_ID";
+    var ENV_SECRET = "AWS_SECRET_ACCESS_KEY";
+    var ENV_SESSION = "AWS_SESSION_TOKEN";
+    var ENV_EXPIRATION = "AWS_CREDENTIAL_EXPIRATION";
+    var ENV_CREDENTIAL_SCOPE = "AWS_CREDENTIAL_SCOPE";
+    var ENV_ACCOUNT_ID = "AWS_ACCOUNT_ID";
+    var fromEnv = (init) => async () => {
+      init?.logger?.debug("@aws-sdk/credential-provider-env - fromEnv");
+      const accessKeyId = process.env[ENV_KEY];
+      const secretAccessKey = process.env[ENV_SECRET];
+      const sessionToken = process.env[ENV_SESSION];
+      const expiry = process.env[ENV_EXPIRATION];
+      const credentialScope = process.env[ENV_CREDENTIAL_SCOPE];
+      const accountId = process.env[ENV_ACCOUNT_ID];
+      if (accessKeyId && secretAccessKey) {
+        const credentials = {
+          accessKeyId,
+          secretAccessKey,
+          ...sessionToken && { sessionToken },
+          ...expiry && { expiration: new Date(expiry) },
+          ...credentialScope && { credentialScope },
+          ...accountId && { accountId }
+        };
+        client.setCredentialFeature(credentials, "CREDENTIALS_ENV_VARS", "g");
+        return credentials;
+      }
+      throw new propertyProvider.CredentialsProviderError("Unable to find environment variable credentials.", { logger: init?.logger });
+    };
+    exports.ENV_ACCOUNT_ID = ENV_ACCOUNT_ID;
+    exports.ENV_CREDENTIAL_SCOPE = ENV_CREDENTIAL_SCOPE;
+    exports.ENV_EXPIRATION = ENV_EXPIRATION;
+    exports.ENV_KEY = ENV_KEY;
+    exports.ENV_SECRET = ENV_SECRET;
+    exports.ENV_SESSION = ENV_SESSION;
+    exports.fromEnv = fromEnv;
+  }
+});
+
+export {
+  require_dist_cjs2 as require_dist_cjs
+};
+//# sourceMappingURL=data:application/json;base64,ewogICJ2ZXJzaW9uIjogMywKICAic291cmNlcyI6IFsiLi4vLi4vbm9kZV9tb2R1bGVzLy5wbnBtL0Bhd3Mtc2RrK2NyZWRlbnRpYWwtcHJvdmlkZXItZW52QDMuOTcyLjI0L25vZGVfbW9kdWxlcy9AYXdzLXNkay9jcmVkZW50aWFsLXByb3ZpZGVyLWVudi9kaXN0LWNqcy9pbmRleC5qcyJdLAogICJzb3VyY2VzQ29udGVudCI6IFsiJ3VzZSBzdHJpY3QnO1xuXG52YXIgY2xpZW50ID0gcmVxdWlyZSgnQGF3cy1zZGsvY29yZS9jbGllbnQnKTtcbnZhciBwcm9wZXJ0eVByb3ZpZGVyID0gcmVxdWlyZSgnQHNtaXRoeS9wcm9wZXJ0eS1wcm92aWRlcicpO1xuXG5jb25zdCBFTlZfS0VZID0gXCJBV1NfQUNDRVNTX0tFWV9JRFwiO1xuY29uc3QgRU5WX1NFQ1JFVCA9IFwiQVdTX1NFQ1JFVF9BQ0NFU1NfS0VZXCI7XG5jb25zdCBFTlZfU0VTU0lPTiA9IFwiQVdTX1NFU1NJT05fVE9LRU5cIjtcbmNvbnN0IEVOVl9FWFBJUkFUSU9OID0gXCJBV1NfQ1JFREVOVElBTF9FWFBJUkFUSU9OXCI7XG5jb25zdCBFTlZfQ1JFREVOVElBTF9TQ09QRSA9IFwiQVdTX0NSRURFTlRJQUxfU0NPUEVcIjtcbmNvbnN0IEVOVl9BQ0NPVU5UX0lEID0gXCJBV1NfQUNDT1VOVF9JRFwiO1xuY29uc3QgZnJvbUVudiA9IChpbml0KSA9PiBhc3luYyAoKSA9PiB7XG4gICAgaW5pdD8ubG9nZ2VyPy5kZWJ1ZyhcIkBhd3Mtc2RrL2NyZWRlbnRpYWwtcHJvdmlkZXItZW52IC0gZnJvbUVudlwiKTtcbiAgICBjb25zdCBhY2Nlc3NLZXlJZCA9IHByb2Nlc3MuZW52W0VOVl9LRVldO1xuICAgIGNvbnN0IHNlY3JldEFjY2Vzc0tleSA9IHByb2Nlc3MuZW52W0VOVl9TRUNSRVRdO1xuICAgIGNvbnN0IHNlc3Npb25Ub2tlbiA9IHByb2Nlc3MuZW52W0VOVl9TRVNTSU9OXTtcbiAgICBjb25zdCBleHBpcnkgPSBwcm9jZXNzLmVudltFTlZfRVhQSVJBVElPTl07XG4gICAgY29uc3QgY3JlZGVudGlhbFNjb3BlID0gcHJvY2Vzcy5lbnZbRU5WX0NSRURFTlRJQUxfU0NPUEVdO1xuICAgIGNvbnN0IGFjY291bnRJZCA9IHByb2Nlc3MuZW52W0VOVl9BQ0NPVU5UX0lEXTtcbiAgICBpZiAoYWNjZXNzS2V5SWQgJiYgc2VjcmV0QWNjZXNzS2V5KSB7XG4gICAgICAgIGNvbnN0IGNyZWRlbnRpYWxzID0ge1xuICAgICAgICAgICAgYWNjZXNzS2V5SWQsXG4gICAgICAgICAgICBzZWNyZXRBY2Nlc3NLZXksXG4gICAgICAgICAgICAuLi4oc2Vzc2lvblRva2VuICYmIHsgc2Vzc2lvblRva2VuIH0pLFxuICAgICAgICAgICAgLi4uKGV4cGlyeSAmJiB7IGV4cGlyYXRpb246IG5ldyBEYXRlKGV4cGlyeSkgfSksXG4gICAgICAgICAgICAuLi4oY3JlZGVudGlhbFNjb3BlICYmIHsgY3JlZGVudGlhbFNjb3BlIH0pLFxuICAgICAgICAgICAgLi4uKGFjY291bnRJZCAmJiB7IGFjY291bnRJZCB9KSxcbiAgICAgICAgfTtcbiAgICAgICAgY2xpZW50LnNldENyZWRlbnRpYWxGZWF0dXJlKGNyZWRlbnRpYWxzLCBcIkNSRURFTlRJQUxTX0VOVl9WQVJTXCIsIFwiZ1wiKTtcbiAgICAgICAgcmV0dXJuIGNyZWRlbnRpYWxzO1xuICAgIH1cbiAgICB0aHJvdyBuZXcgcHJvcGVydHlQcm92aWRlci5DcmVkZW50aWFsc1Byb3ZpZGVyRXJyb3IoXCJVbmFibGUgdG8gZmluZCBlbnZpcm9ubWVudCB2YXJpYWJsZSBjcmVkZW50aWFscy5cIiwgeyBsb2dnZXI6IGluaXQ/LmxvZ2dlciB9KTtcbn07XG5cbmV4cG9ydHMuRU5WX0FDQ09VTlRfSUQgPSBFTlZfQUNDT1VOVF9JRDtcbmV4cG9ydHMuRU5WX0NSRURFTlRJQUxfU0NPUEUgPSBFTlZfQ1JFREVOVElBTF9TQ09QRTtcbmV4cG9ydHMuRU5WX0VYUElSQVRJT04gPSBFTlZfRVhQSVJBVElPTjtcbmV4cG9ydHMuRU5WX0tFWSA9IEVOVl9LRVk7XG5leHBvcnRzLkVOVl9TRUNSRVQgPSBFTlZfU0VDUkVUO1xuZXhwb3J0cy5FTlZfU0VTU0lPTiA9IEVOVl9TRVNTSU9OO1xuZXhwb3J0cy5mcm9tRW52ID0gZnJvbUVudjtcbiJdLAogICJtYXBwaW5ncyI6ICI7Ozs7Ozs7Ozs7Ozs7Ozs7QUFBQSxJQUFBQSxvQkFBQTtBQUFBO0FBRUEsUUFBSSxTQUFTO0FBQ2IsUUFBSSxtQkFBbUI7QUFFdkIsUUFBTSxVQUFVO0FBQ2hCLFFBQU0sYUFBYTtBQUNuQixRQUFNLGNBQWM7QUFDcEIsUUFBTSxpQkFBaUI7QUFDdkIsUUFBTSx1QkFBdUI7QUFDN0IsUUFBTSxpQkFBaUI7QUFDdkIsUUFBTSxVQUFVLENBQUMsU0FBUyxZQUFZO0FBQ2xDLFlBQU0sUUFBUSxNQUFNLDRDQUE0QztBQUNoRSxZQUFNLGNBQWMsUUFBUSxJQUFJLE9BQU87QUFDdkMsWUFBTSxrQkFBa0IsUUFBUSxJQUFJLFVBQVU7QUFDOUMsWUFBTSxlQUFlLFFBQVEsSUFBSSxXQUFXO0FBQzVDLFlBQU0sU0FBUyxRQUFRLElBQUksY0FBYztBQUN6QyxZQUFNLGtCQUFrQixRQUFRLElBQUksb0JBQW9CO0FBQ3hELFlBQU0sWUFBWSxRQUFRLElBQUksY0FBYztBQUM1QyxVQUFJLGVBQWUsaUJBQWlCO0FBQ2hDLGNBQU0sY0FBYztBQUFBLFVBQ2hCO0FBQUEsVUFDQTtBQUFBLFVBQ0EsR0FBSSxnQkFBZ0IsRUFBRSxhQUFhO0FBQUEsVUFDbkMsR0FBSSxVQUFVLEVBQUUsWUFBWSxJQUFJLEtBQUssTUFBTSxFQUFFO0FBQUEsVUFDN0MsR0FBSSxtQkFBbUIsRUFBRSxnQkFBZ0I7QUFBQSxVQUN6QyxHQUFJLGFBQWEsRUFBRSxVQUFVO0FBQUEsUUFDakM7QUFDQSxlQUFPLHFCQUFxQixhQUFhLHdCQUF3QixHQUFHO0FBQ3BFLGVBQU87QUFBQSxNQUNYO0FBQ0EsWUFBTSxJQUFJLGlCQUFpQix5QkFBeUIsb0RBQW9ELEVBQUUsUUFBUSxNQUFNLE9BQU8sQ0FBQztBQUFBLElBQ3BJO0FBRUEsWUFBUSxpQkFBaUI7QUFDekIsWUFBUSx1QkFBdUI7QUFDL0IsWUFBUSxpQkFBaUI7QUFDekIsWUFBUSxVQUFVO0FBQ2xCLFlBQVEsYUFBYTtBQUNyQixZQUFRLGNBQWM7QUFDdEIsWUFBUSxVQUFVO0FBQUE7QUFBQTsiLAogICJuYW1lcyI6IFsicmVxdWlyZV9kaXN0X2NqcyJdCn0K

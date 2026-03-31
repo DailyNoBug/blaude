@@ -1,0 +1,24 @@
+#!/usr/bin/env node
+import { createRequire as __blaudeCreateRequire } from "module";
+const require = __blaudeCreateRequire(import.meta.url);
+import "./chunk-O5PZ3G6I.mjs";
+
+// src/cli/bg.ts
+async function psHandler(_args) {
+}
+async function logsHandler(_id) {
+}
+async function attachHandler(_id) {
+}
+async function killHandler(_id) {
+}
+async function handleBgFlag(_args) {
+}
+export {
+  attachHandler,
+  handleBgFlag,
+  killHandler,
+  logsHandler,
+  psHandler
+};
+//# sourceMappingURL=data:application/json;base64,ewogICJ2ZXJzaW9uIjogMywKICAic291cmNlcyI6IFsiLi4vLi4vc3JjL2NsaS9iZy50cyJdLAogICJzb3VyY2VzQ29udGVudCI6IFsiZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIHBzSGFuZGxlcihfYXJncz86IHN0cmluZ1tdKTogUHJvbWlzZTx2b2lkPiB7fVxuXG5leHBvcnQgYXN5bmMgZnVuY3Rpb24gbG9nc0hhbmRsZXIoX2lkPzogc3RyaW5nKTogUHJvbWlzZTx2b2lkPiB7fVxuXG5leHBvcnQgYXN5bmMgZnVuY3Rpb24gYXR0YWNoSGFuZGxlcihfaWQ/OiBzdHJpbmcpOiBQcm9taXNlPHZvaWQ+IHt9XG5cbmV4cG9ydCBhc3luYyBmdW5jdGlvbiBraWxsSGFuZGxlcihfaWQ/OiBzdHJpbmcpOiBQcm9taXNlPHZvaWQ+IHt9XG5cbmV4cG9ydCBhc3luYyBmdW5jdGlvbiBoYW5kbGVCZ0ZsYWcoX2FyZ3M6IHN0cmluZ1tdKTogUHJvbWlzZTx2b2lkPiB7fVxuIl0sCiAgIm1hcHBpbmdzIjogIjs7Ozs7O0FBQUEsZUFBc0IsVUFBVSxPQUFpQztBQUFDO0FBRWxFLGVBQXNCLFlBQVksS0FBNkI7QUFBQztBQUVoRSxlQUFzQixjQUFjLEtBQTZCO0FBQUM7QUFFbEUsZUFBc0IsWUFBWSxLQUE2QjtBQUFDO0FBRWhFLGVBQXNCLGFBQWEsT0FBZ0M7QUFBQzsiLAogICJuYW1lcyI6IFtdCn0K

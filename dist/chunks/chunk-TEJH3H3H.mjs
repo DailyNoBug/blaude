@@ -1,0 +1,88 @@
+#!/usr/bin/env node
+import { createRequire as __blaudeCreateRequire } from "module";
+const require = __blaudeCreateRequire(import.meta.url);
+import {
+  __esm
+} from "./chunk-O5PZ3G6I.mjs";
+
+// scripts/shims/react.mjs
+import { createRequire } from "module";
+var require2, React, Activity, Children, Component, Fragment, Profiler, PureComponent, StrictMode, Suspense, act, cache, cacheSignal, captureOwnerStack, cloneElement, createContext, createElement, createRef, forwardRef, isValidElement, lazy, memo, startTransition, unstable_useCacheRefresh, use, useActionState, useCallback, useContext, useDebugValue, useDeferredValue, useEffect, useEffectEvent, useId, useImperativeHandle, useInsertionEffect, useLayoutEffect, useMemo, useOptimistic, useReducer, useRef, useState, useSyncExternalStore, useTransition, version, react_default;
+var init_react = __esm({
+  "scripts/shims/react.mjs"() {
+    require2 = createRequire(import.meta.url);
+    React = require2("react");
+    Activity = React.Activity;
+    Children = React.Children;
+    Component = React.Component;
+    Fragment = React.Fragment;
+    Profiler = React.Profiler;
+    PureComponent = React.PureComponent;
+    StrictMode = React.StrictMode;
+    Suspense = React.Suspense;
+    act = React.act;
+    cache = React.cache;
+    cacheSignal = React.cacheSignal;
+    captureOwnerStack = React.captureOwnerStack;
+    cloneElement = React.cloneElement;
+    createContext = React.createContext;
+    createElement = React.createElement;
+    createRef = React.createRef;
+    forwardRef = React.forwardRef;
+    isValidElement = React.isValidElement;
+    lazy = React.lazy;
+    memo = React.memo;
+    startTransition = React.startTransition;
+    unstable_useCacheRefresh = React.unstable_useCacheRefresh;
+    use = React.use;
+    useActionState = React.useActionState;
+    useCallback = React.useCallback;
+    useContext = React.useContext;
+    useDebugValue = React.useDebugValue;
+    useDeferredValue = React.useDeferredValue;
+    useEffect = React.useEffect;
+    useEffectEvent = React.useEffectEvent;
+    useId = React.useId;
+    useImperativeHandle = React.useImperativeHandle;
+    useInsertionEffect = React.useInsertionEffect;
+    useLayoutEffect = React.useLayoutEffect;
+    useMemo = React.useMemo;
+    useOptimistic = React.useOptimistic;
+    useReducer = React.useReducer;
+    useRef = React.useRef;
+    useState = React.useState;
+    useSyncExternalStore = React.useSyncExternalStore;
+    useTransition = React.useTransition;
+    version = React.version;
+    react_default = React;
+  }
+});
+
+export {
+  Children,
+  Component,
+  Fragment,
+  PureComponent,
+  Suspense,
+  createContext,
+  createElement,
+  isValidElement,
+  memo,
+  use,
+  useCallback,
+  useContext,
+  useDeferredValue,
+  useEffect,
+  useEffectEvent,
+  useImperativeHandle,
+  useInsertionEffect,
+  useLayoutEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  react_default,
+  init_react
+};
+//# sourceMappingURL=data:application/json;base64,ewogICJ2ZXJzaW9uIjogMywKICAic291cmNlcyI6IFsiLi4vLi4vc2NyaXB0cy9zaGltcy9yZWFjdC5tanMiXSwKICAic291cmNlc0NvbnRlbnQiOiBbImltcG9ydCB7IGNyZWF0ZVJlcXVpcmUgfSBmcm9tIFwibW9kdWxlXCI7XG5cbmNvbnN0IHJlcXVpcmUgPSBjcmVhdGVSZXF1aXJlKGltcG9ydC5tZXRhLnVybCk7XG5jb25zdCBSZWFjdCA9IHJlcXVpcmUoXCJyZWFjdFwiKTtcblxuZXhwb3J0IGNvbnN0IEFjdGl2aXR5ID0gUmVhY3QuQWN0aXZpdHk7XG5leHBvcnQgY29uc3QgQ2hpbGRyZW4gPSBSZWFjdC5DaGlsZHJlbjtcbmV4cG9ydCBjb25zdCBDb21wb25lbnQgPSBSZWFjdC5Db21wb25lbnQ7XG5leHBvcnQgY29uc3QgRnJhZ21lbnQgPSBSZWFjdC5GcmFnbWVudDtcbmV4cG9ydCBjb25zdCBQcm9maWxlciA9IFJlYWN0LlByb2ZpbGVyO1xuZXhwb3J0IGNvbnN0IFB1cmVDb21wb25lbnQgPSBSZWFjdC5QdXJlQ29tcG9uZW50O1xuZXhwb3J0IGNvbnN0IFN0cmljdE1vZGUgPSBSZWFjdC5TdHJpY3RNb2RlO1xuZXhwb3J0IGNvbnN0IFN1c3BlbnNlID0gUmVhY3QuU3VzcGVuc2U7XG5leHBvcnQgY29uc3QgYWN0ID0gUmVhY3QuYWN0O1xuZXhwb3J0IGNvbnN0IGNhY2hlID0gUmVhY3QuY2FjaGU7XG5leHBvcnQgY29uc3QgY2FjaGVTaWduYWwgPSBSZWFjdC5jYWNoZVNpZ25hbDtcbmV4cG9ydCBjb25zdCBjYXB0dXJlT3duZXJTdGFjayA9IFJlYWN0LmNhcHR1cmVPd25lclN0YWNrO1xuZXhwb3J0IGNvbnN0IGNsb25lRWxlbWVudCA9IFJlYWN0LmNsb25lRWxlbWVudDtcbmV4cG9ydCBjb25zdCBjcmVhdGVDb250ZXh0ID0gUmVhY3QuY3JlYXRlQ29udGV4dDtcbmV4cG9ydCBjb25zdCBjcmVhdGVFbGVtZW50ID0gUmVhY3QuY3JlYXRlRWxlbWVudDtcbmV4cG9ydCBjb25zdCBjcmVhdGVSZWYgPSBSZWFjdC5jcmVhdGVSZWY7XG5leHBvcnQgY29uc3QgZm9yd2FyZFJlZiA9IFJlYWN0LmZvcndhcmRSZWY7XG5leHBvcnQgY29uc3QgaXNWYWxpZEVsZW1lbnQgPSBSZWFjdC5pc1ZhbGlkRWxlbWVudDtcbmV4cG9ydCBjb25zdCBsYXp5ID0gUmVhY3QubGF6eTtcbmV4cG9ydCBjb25zdCBtZW1vID0gUmVhY3QubWVtbztcbmV4cG9ydCBjb25zdCBzdGFydFRyYW5zaXRpb24gPSBSZWFjdC5zdGFydFRyYW5zaXRpb247XG5leHBvcnQgY29uc3QgdW5zdGFibGVfdXNlQ2FjaGVSZWZyZXNoID0gUmVhY3QudW5zdGFibGVfdXNlQ2FjaGVSZWZyZXNoO1xuZXhwb3J0IGNvbnN0IHVzZSA9IFJlYWN0LnVzZTtcbmV4cG9ydCBjb25zdCB1c2VBY3Rpb25TdGF0ZSA9IFJlYWN0LnVzZUFjdGlvblN0YXRlO1xuZXhwb3J0IGNvbnN0IHVzZUNhbGxiYWNrID0gUmVhY3QudXNlQ2FsbGJhY2s7XG5leHBvcnQgY29uc3QgdXNlQ29udGV4dCA9IFJlYWN0LnVzZUNvbnRleHQ7XG5leHBvcnQgY29uc3QgdXNlRGVidWdWYWx1ZSA9IFJlYWN0LnVzZURlYnVnVmFsdWU7XG5leHBvcnQgY29uc3QgdXNlRGVmZXJyZWRWYWx1ZSA9IFJlYWN0LnVzZURlZmVycmVkVmFsdWU7XG5leHBvcnQgY29uc3QgdXNlRWZmZWN0ID0gUmVhY3QudXNlRWZmZWN0O1xuZXhwb3J0IGNvbnN0IHVzZUVmZmVjdEV2ZW50ID0gUmVhY3QudXNlRWZmZWN0RXZlbnQ7XG5leHBvcnQgY29uc3QgdXNlSWQgPSBSZWFjdC51c2VJZDtcbmV4cG9ydCBjb25zdCB1c2VJbXBlcmF0aXZlSGFuZGxlID0gUmVhY3QudXNlSW1wZXJhdGl2ZUhhbmRsZTtcbmV4cG9ydCBjb25zdCB1c2VJbnNlcnRpb25FZmZlY3QgPSBSZWFjdC51c2VJbnNlcnRpb25FZmZlY3Q7XG5leHBvcnQgY29uc3QgdXNlTGF5b3V0RWZmZWN0ID0gUmVhY3QudXNlTGF5b3V0RWZmZWN0O1xuZXhwb3J0IGNvbnN0IHVzZU1lbW8gPSBSZWFjdC51c2VNZW1vO1xuZXhwb3J0IGNvbnN0IHVzZU9wdGltaXN0aWMgPSBSZWFjdC51c2VPcHRpbWlzdGljO1xuZXhwb3J0IGNvbnN0IHVzZVJlZHVjZXIgPSBSZWFjdC51c2VSZWR1Y2VyO1xuZXhwb3J0IGNvbnN0IHVzZVJlZiA9IFJlYWN0LnVzZVJlZjtcbmV4cG9ydCBjb25zdCB1c2VTdGF0ZSA9IFJlYWN0LnVzZVN0YXRlO1xuZXhwb3J0IGNvbnN0IHVzZVN5bmNFeHRlcm5hbFN0b3JlID0gUmVhY3QudXNlU3luY0V4dGVybmFsU3RvcmU7XG5leHBvcnQgY29uc3QgdXNlVHJhbnNpdGlvbiA9IFJlYWN0LnVzZVRyYW5zaXRpb247XG5leHBvcnQgY29uc3QgdmVyc2lvbiA9IFJlYWN0LnZlcnNpb247XG5leHBvcnQgZGVmYXVsdCBSZWFjdDtcbiJdLAogICJtYXBwaW5ncyI6ICI7Ozs7Ozs7O0FBQUEsU0FBUyxxQkFBcUI7QUFBOUIsSUFFTUEsVUFDQSxPQUVPLFVBQ0EsVUFDQSxXQUNBLFVBQ0EsVUFDQSxlQUNBLFlBQ0EsVUFDQSxLQUNBLE9BQ0EsYUFDQSxtQkFDQSxjQUNBLGVBQ0EsZUFDQSxXQUNBLFlBQ0EsZ0JBQ0EsTUFDQSxNQUNBLGlCQUNBLDBCQUNBLEtBQ0EsZ0JBQ0EsYUFDQSxZQUNBLGVBQ0Esa0JBQ0EsV0FDQSxnQkFDQSxPQUNBLHFCQUNBLG9CQUNBLGlCQUNBLFNBQ0EsZUFDQSxZQUNBLFFBQ0EsVUFDQSxzQkFDQSxlQUNBLFNBQ047QUEvQ1A7QUFBQTtBQUVBLElBQU1BLFdBQVUsY0FBYyxZQUFZLEdBQUc7QUFDN0MsSUFBTSxRQUFRQSxTQUFRLE9BQU87QUFFdEIsSUFBTSxXQUFXLE1BQU07QUFDdkIsSUFBTSxXQUFXLE1BQU07QUFDdkIsSUFBTSxZQUFZLE1BQU07QUFDeEIsSUFBTSxXQUFXLE1BQU07QUFDdkIsSUFBTSxXQUFXLE1BQU07QUFDdkIsSUFBTSxnQkFBZ0IsTUFBTTtBQUM1QixJQUFNLGFBQWEsTUFBTTtBQUN6QixJQUFNLFdBQVcsTUFBTTtBQUN2QixJQUFNLE1BQU0sTUFBTTtBQUNsQixJQUFNLFFBQVEsTUFBTTtBQUNwQixJQUFNLGNBQWMsTUFBTTtBQUMxQixJQUFNLG9CQUFvQixNQUFNO0FBQ2hDLElBQU0sZUFBZSxNQUFNO0FBQzNCLElBQU0sZ0JBQWdCLE1BQU07QUFDNUIsSUFBTSxnQkFBZ0IsTUFBTTtBQUM1QixJQUFNLFlBQVksTUFBTTtBQUN4QixJQUFNLGFBQWEsTUFBTTtBQUN6QixJQUFNLGlCQUFpQixNQUFNO0FBQzdCLElBQU0sT0FBTyxNQUFNO0FBQ25CLElBQU0sT0FBTyxNQUFNO0FBQ25CLElBQU0sa0JBQWtCLE1BQU07QUFDOUIsSUFBTSwyQkFBMkIsTUFBTTtBQUN2QyxJQUFNLE1BQU0sTUFBTTtBQUNsQixJQUFNLGlCQUFpQixNQUFNO0FBQzdCLElBQU0sY0FBYyxNQUFNO0FBQzFCLElBQU0sYUFBYSxNQUFNO0FBQ3pCLElBQU0sZ0JBQWdCLE1BQU07QUFDNUIsSUFBTSxtQkFBbUIsTUFBTTtBQUMvQixJQUFNLFlBQVksTUFBTTtBQUN4QixJQUFNLGlCQUFpQixNQUFNO0FBQzdCLElBQU0sUUFBUSxNQUFNO0FBQ3BCLElBQU0sc0JBQXNCLE1BQU07QUFDbEMsSUFBTSxxQkFBcUIsTUFBTTtBQUNqQyxJQUFNLGtCQUFrQixNQUFNO0FBQzlCLElBQU0sVUFBVSxNQUFNO0FBQ3RCLElBQU0sZ0JBQWdCLE1BQU07QUFDNUIsSUFBTSxhQUFhLE1BQU07QUFDekIsSUFBTSxTQUFTLE1BQU07QUFDckIsSUFBTSxXQUFXLE1BQU07QUFDdkIsSUFBTSx1QkFBdUIsTUFBTTtBQUNuQyxJQUFNLGdCQUFnQixNQUFNO0FBQzVCLElBQU0sVUFBVSxNQUFNO0FBQzdCLElBQU8sZ0JBQVE7QUFBQTtBQUFBOyIsCiAgIm5hbWVzIjogWyJyZXF1aXJlIl0KfQo=
