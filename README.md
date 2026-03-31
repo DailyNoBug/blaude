@@ -1,257 +1,309 @@
-# Claude Code — Leaked Source (2026-03-31)
+# Blaude
 
-> **On March 31, 2026, the full source code of Anthropic's Claude Code CLI was leaked** via a `.map` file exposed in their npm registry.
+`Blaude` is the independent CLI/TUI runtime in this repository. It is a local rewrite and modification derived from the `2026-03-31` leaked Claude Code source tree, but it no longer depends on the official `@anthropic-ai/claude-code` npm package to build or run.
 
----
+This repository contains:
 
-## How It Leaked
+- the leaked `src/` tree from the `2026-03-31` Claude Code leak
+- the active in-repo rewrite runtime under `black-src/`
 
-[Chaofan Shou (@Fried_rice)](https://x.com/Fried_rice) discovered the leak and posted it publicly:
+The executable command exposed by this project is now:
 
-> **"Claude code source code has been leaked via a map file in their npm registry!"**
->
-> — [@Fried_rice, March 31, 2026](https://x.com/Fried_rice/status/2038894956459290963)
-
-The source map file in the published npm package contained a reference to the full, unobfuscated TypeScript source, which was downloadable as a zip archive from Anthropic's R2 storage bucket.
-
----
-
-## Overview
-
-Claude Code is Anthropic's official CLI tool that lets you interact with Claude directly from the terminal to perform software engineering tasks — editing files, running commands, searching codebases, managing git workflows, and more.
-
-This repository contains the leaked `src/` directory.
-
-- **Leaked on**: 2026-03-31
-- **Language**: TypeScript
-- **Runtime**: Bun
-- **Terminal UI**: React + [Ink](https://github.com/vadimdemedes/ink) (React for CLI)
-- **Scale**: ~1,900 files, 512,000+ lines of code
-
----
-
-## Directory Structure
-
-```
-src/
-├── main.tsx                 # Entrypoint (Commander.js-based CLI parser)
-├── commands.ts              # Command registry
-├── tools.ts                 # Tool registry
-├── Tool.ts                  # Tool type definitions
-├── QueryEngine.ts           # LLM query engine (core Anthropic API caller)
-├── context.ts               # System/user context collection
-├── cost-tracker.ts          # Token cost tracking
-│
-├── commands/                # Slash command implementations (~50)
-├── tools/                   # Agent tool implementations (~40)
-├── components/              # Ink UI components (~140)
-├── hooks/                   # React hooks
-├── services/                # External service integrations
-├── screens/                 # Full-screen UIs (Doctor, REPL, Resume)
-├── types/                   # TypeScript type definitions
-├── utils/                   # Utility functions
-│
-├── bridge/                  # IDE integration bridge (VS Code, JetBrains)
-├── coordinator/             # Multi-agent coordinator
-├── plugins/                 # Plugin system
-├── skills/                  # Skill system
-├── keybindings/             # Keybinding configuration
-├── vim/                     # Vim mode
-├── voice/                   # Voice input
-├── remote/                  # Remote sessions
-├── server/                  # Server mode
-├── memdir/                  # Memory directory (persistent memory)
-├── tasks/                   # Task management
-├── state/                   # State management
-├── migrations/              # Config migrations
-├── schemas/                 # Config schemas (Zod)
-├── entrypoints/             # Initialization logic
-├── ink/                     # Ink renderer wrapper
-├── buddy/                   # Companion sprite (Easter egg)
-├── native-ts/               # Native TypeScript utils
-├── outputStyles/            # Output styling
-├── query/                   # Query pipeline
-└── upstreamproxy/           # Proxy configuration
+```bash
+blaude
 ```
 
----
+Note: building the repo does not automatically place `blaude` on your shell `PATH`. Run the install step below once to register the command.
 
-## Core Architecture
+## Current Status
 
-### 1. Tool System (`src/tools/`)
+What Blaude already provides:
 
-Every tool Claude Code can invoke is implemented as a self-contained module. Each tool defines its input schema, permission model, and execution logic.
+- independent CLI and interactive TUI
+- `blaude` command entrypoint
+- provider-backed model execution from `settings.json`
+- runtime logs in the UI and on disk
+- slash-command palette with Tab completion
+- `!<command>` shell shortcut mode and `!!` rerun
+- `@file` prompt attachments with path completion
+- shell, file, search, and edit tools
+- simple sub-agent delegation
 
-| Tool | Description |
-|---|---|
-| `BashTool` | Shell command execution |
-| `FileReadTool` | File reading (images, PDFs, notebooks) |
-| `FileWriteTool` | File creation / overwrite |
-| `FileEditTool` | Partial file modification (string replacement) |
-| `GlobTool` | File pattern matching search |
-| `GrepTool` | ripgrep-based content search |
-| `WebFetchTool` | Fetch URL content |
-| `WebSearchTool` | Web search |
-| `AgentTool` | Sub-agent spawning |
-| `SkillTool` | Skill execution |
-| `MCPTool` | MCP server tool invocation |
-| `LSPTool` | Language Server Protocol integration |
-| `NotebookEditTool` | Jupyter notebook editing |
-| `TaskCreateTool` / `TaskUpdateTool` | Task creation and management |
-| `SendMessageTool` | Inter-agent messaging |
-| `TeamCreateTool` / `TeamDeleteTool` | Team agent management |
-| `EnterPlanModeTool` / `ExitPlanModeTool` | Plan mode toggle |
-| `EnterWorktreeTool` / `ExitWorktreeTool` | Git worktree isolation |
-| `ToolSearchTool` | Deferred tool discovery |
-| `CronCreateTool` | Scheduled trigger creation |
-| `RemoteTriggerTool` | Remote trigger |
-| `SleepTool` | Proactive mode wait |
-| `SyntheticOutputTool` | Structured output generation |
+What it is not:
 
-### 2. Command System (`src/commands/`)
+- not a byte-for-byte rebuild of the leaked Claude Code source
+- not yet full parity with the latest official Claude Code
+- not dependent on the official Claude Code npm package
 
-User-facing slash commands invoked with `/` prefix.
+For parity gaps and roadmap, see [BLACK_CODE_PARITY_GAP.md](./BLACK_CODE_PARITY_GAP.md).
 
-| Command | Description |
-|---|---|
-| `/commit` | Create a git commit |
-| `/review` | Code review |
-| `/compact` | Context compression |
-| `/mcp` | MCP server management |
-| `/config` | Settings management |
-| `/doctor` | Environment diagnostics |
-| `/login` / `/logout` | Authentication |
-| `/memory` | Persistent memory management |
-| `/skills` | Skill management |
-| `/tasks` | Task management |
-| `/vim` | Vim mode toggle |
-| `/diff` | View changes |
-| `/cost` | Check usage cost |
-| `/theme` | Change theme |
-| `/context` | Context visualization |
-| `/pr_comments` | View PR comments |
-| `/resume` | Restore previous session |
-| `/share` | Share session |
-| `/desktop` | Desktop app handoff |
-| `/mobile` | Mobile app handoff |
+## Requirements
 
-### 3. Service Layer (`src/services/`)
+- macOS or Linux
+- Node.js `>= 20`
+- `pnpm` `>= 10`
+- optional but strongly recommended: `git`, `rg`
 
-| Service | Description |
-|---|---|
-| `api/` | Anthropic API client, file API, bootstrap |
-| `mcp/` | Model Context Protocol server connection and management |
-| `oauth/` | OAuth 2.0 authentication flow |
-| `lsp/` | Language Server Protocol manager |
-| `analytics/` | GrowthBook-based feature flags and analytics |
-| `plugins/` | Plugin loader |
-| `compact/` | Conversation context compression |
-| `policyLimits/` | Organization policy limits |
-| `remoteManagedSettings/` | Remote managed settings |
-| `extractMemories/` | Automatic memory extraction |
-| `tokenEstimation.ts` | Token count estimation |
-| `teamMemorySync/` | Team memory synchronization |
+Check your local toolchain:
 
-### 4. Bridge System (`src/bridge/`)
-
-A bidirectional communication layer connecting IDE extensions (VS Code, JetBrains) with the Claude Code CLI.
-
-- `bridgeMain.ts` — Bridge main loop
-- `bridgeMessaging.ts` — Message protocol
-- `bridgePermissionCallbacks.ts` — Permission callbacks
-- `replBridge.ts` — REPL session bridge
-- `jwtUtils.ts` — JWT-based authentication
-- `sessionRunner.ts` — Session execution management
-
-### 5. Permission System (`src/hooks/toolPermission/`)
-
-Checks permissions on every tool invocation. Either prompts the user for approval/denial or automatically resolves based on the configured permission mode (`default`, `plan`, `bypassPermissions`, `auto`, etc.).
-
-### 6. Feature Flags
-
-Dead code elimination via Bun's `bun:bundle` feature flags:
-
-```typescript
-import { feature } from 'bun:bundle'
-
-// Inactive code is completely stripped at build time
-const voiceCommand = feature('VOICE_MODE')
-  ? require('./commands/voice/index.js').default
-  : null
+```bash
+node -v
+pnpm -v
+git --version
+rg --version
 ```
 
-Notable flags: `PROACTIVE`, `KAIROS`, `BRIDGE_MODE`, `DAEMON`, `VOICE_MODE`, `AGENT_TRIGGERS`, `MONITOR_TOOL`
+## Project Origin
 
----
+This rewrite was modified from the Claude Code `20260331` leaked source snapshot.
 
-## Key Files in Detail
+Concretely:
 
-### `QueryEngine.ts` (~46K lines)
+- the leaked source tree remains in `src/`
+- the runnable runtime is the rewrite in `black-src/`
+- packaging, startup, TUI behavior, and provider wiring have been reworked locally
 
-The core engine for LLM API calls. Handles streaming responses, tool-call loops, thinking mode, retry logic, and token counting.
+## Build From Source
 
-### `Tool.ts` (~29K lines)
+1. Clone or enter the repository:
 
-Defines base types and interfaces for all tools — input schemas, permission models, and progress state types.
-
-### `commands.ts` (~25K lines)
-
-Manages registration and execution of all slash commands. Uses conditional imports to load different command sets per environment.
-
-### `main.tsx`
-
-Commander.js-based CLI parser + React/Ink renderer initialization. At startup, parallelizes MDM settings, keychain prefetch, and GrowthBook initialization for faster boot.
-
----
-
-## Tech Stack
-
-| Category | Technology |
-|---|---|
-| Runtime | [Bun](https://bun.sh) |
-| Language | TypeScript (strict) |
-| Terminal UI | [React](https://react.dev) + [Ink](https://github.com/vadimdemedes/ink) |
-| CLI Parsing | [Commander.js](https://github.com/tj/commander.js) (extra-typings) |
-| Schema Validation | [Zod v4](https://zod.dev) |
-| Code Search | [ripgrep](https://github.com/BurntSushi/ripgrep) (via GrepTool) |
-| Protocols | [MCP SDK](https://modelcontextprotocol.io), LSP |
-| API | [Anthropic SDK](https://docs.anthropic.com) |
-| Telemetry | OpenTelemetry + gRPC |
-| Feature Flags | GrowthBook |
-| Auth | OAuth 2.0, JWT, macOS Keychain |
-
----
-
-## Notable Design Patterns
-
-### Parallel Prefetch
-
-Startup time is optimized by prefetching MDM settings, keychain reads, and API preconnect in parallel — before heavy module evaluation begins.
-
-```typescript
-// main.tsx — fired as side-effects before other imports
-startMdmRawRead()
-startKeychainPrefetch()
+```bash
+cd /path/to/claude-code
 ```
 
-### Lazy Loading
+2. Install dependencies:
 
-Heavy modules (OpenTelemetry ~400KB, gRPC ~700KB) are deferred via dynamic `import()` until actually needed.
+```bash
+pnpm install
+```
 
-### Agent Swarms
+3. Build the runnable distribution:
 
-Sub-agents are spawned via `AgentTool`, with `coordinator/` handling multi-agent orchestration. `TeamCreateTool` enables team-level parallel work.
+```bash
+pnpm run build
+```
 
-### Skill System
+This creates:
 
-Reusable workflows defined in `skills/` and executed through `SkillTool`. Users can add custom skills.
+- `dist/black-src/`
+- `dist/blaude.mjs`
 
-### Plugin Architecture
+4. Verify the active runtime is independent from the official Claude Code package:
 
-Built-in and third-party plugins are loaded through the `plugins/` subsystem.
+```bash
+pnpm run audit:runtime
+```
 
----
+Expected output:
 
-## Disclaimer
+```text
+Blaude runtime independence audit passed.
+```
 
-This repository archives source code that was leaked from Anthropic's npm registry on **2026-03-31**. All original source code is the property of [Anthropic](https://www.anthropic.com). Contact [nichxbt](https://www.x.com/nichxbt) for any comments.
+5. Run Blaude directly from the built output:
+
+```bash
+pnpm start
+```
+
+Or:
+
+```bash
+node dist/blaude.mjs
+```
+
+## Run Without Building an Install Package
+
+For direct source-mode execution while developing:
+
+```bash
+pnpm run start:src
+```
+
+## Install As `blaude`
+
+There are two recommended install modes.
+
+### Option 1: Install a Global `blaude` Command From This Working Tree
+
+This is the recommended path. It writes a small launcher into `~/.local/bin/blaude` by default, which already matches the common PATH setup on this machine.
+
+Build first:
+
+```bash
+pnpm install
+pnpm run build
+```
+
+Install the global command:
+
+```bash
+pnpm run install:global
+```
+
+This creates:
+
+```text
+~/.local/bin/blaude
+```
+
+If you want another target directory:
+
+```bash
+BLAUDE_BIN_DIR=/custom/bin pnpm run install:global
+```
+
+Verify:
+
+```bash
+blaude -v
+blaude --help
+```
+
+When you change source files later, rebuild once:
+
+```bash
+pnpm run build
+```
+
+### Option 2: Pack and Install a Tarball
+
+Use this when you want a more release-like local install artifact.
+
+Build and create the tarball:
+
+```bash
+pnpm install
+pnpm run pack:local
+```
+
+This writes a package tarball into:
+
+```text
+.artifacts/
+```
+
+Install the tarball globally:
+
+```bash
+pnpm add -g ./.artifacts/blaude-99.99.99-black.1.tgz
+```
+
+Verify:
+
+```bash
+blaude -v
+blaude --help
+```
+
+## Uninstall
+
+If you installed with the local launcher:
+
+```bash
+pnpm run uninstall:global
+```
+
+If you installed from a tarball:
+
+```bash
+pnpm remove -g blaude
+```
+
+## Settings and Provider Configuration
+
+Blaude auto-detects provider settings from:
+
+```text
+./.claude/settings.json
+./.cursor/settings.json
+~/.claude/settings.json
+~/.cursor/settings.json
+~/Library/Application Support/Cursor/User/settings.json
+```
+
+You can also point to a specific file:
+
+```bash
+blaude --settings /path/to/settings.json
+```
+
+Common usage:
+
+```bash
+blaude
+blaude -p "Analyze this repository"
+blaude --agent reviewer -p "Review the current diff"
+blaude --dry-run
+```
+
+## TUI Basics
+
+Inside the TUI:
+
+- `/` opens the command palette
+- `Tab` completes slash commands and `@file` mentions
+- `!<command>` runs a shell command directly
+- `!!` reruns the previous shell command
+- `@path/to/file` attaches a text file to the next prompt
+- `?` shows help
+
+Useful commands:
+
+- `/status`
+- `/logs`
+- `/doctor`
+- `/review`
+- `/diff`
+- `/tasks`
+- `/memory`
+
+## Runtime State
+
+Blaude stores workspace-local runtime state in:
+
+```text
+.claude/blaude/
+```
+
+Files include:
+
+- `session.json`
+- `tasks.json`
+- `memory.md`
+- `history.json`
+- `runtime.log`
+
+If an older `.claude/black-code/` directory exists, Blaude will copy legacy state files into the new location when needed.
+
+## Independence Guarantees
+
+The active runtime is the rewrite in `black-src/`, not the official package.
+
+The audit checks:
+
+- `package.json`
+- `pnpm-lock.yaml`
+- built `dist/`
+- installed `node_modules/`
+
+Run it anytime:
+
+```bash
+pnpm run audit:runtime
+```
+
+## Repository Layout
+
+```text
+black-src/   active Blaude runtime
+dist/        built runtime output
+scripts/     build and audit helpers
+src/         leaked Claude Code source snapshot
+```
+
+## Notes
+
+- The current version string is still `99.99.99-black.1` by design.
+- Internal source folder names still use `black-src/` for continuity, but the runnable product name is `Blaude`.
+- The latest user guide lives in [USER_GUIDE.md](./USER_GUIDE.md).

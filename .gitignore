@@ -1,0 +1,6 @@
+node_modules
+.pnpm-store
+.DS_Store
+.claude/black-code
+.claude/blaude
+.artifacts

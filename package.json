@@ -1,0 +1,39 @@
+{
+  "name": "blaude",
+  "version": "99.99.99-black.1",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.33.0",
+  "bin": {
+    "blaude": "dist/blaude.mjs"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "USER_GUIDE.md",
+    "BLACK_CODE_PARITY_GAP.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "audit": "node scripts/audit-repo.mjs",
+    "audit:runtime": "node scripts/audit-runtime-independence.mjs",
+    "build": "node scripts/build-black-cli.mjs",
+    "pack:local": "pnpm run build && pnpm pack --pack-destination .artifacts",
+    "install:global": "pnpm run build && node scripts/install-local-command.mjs",
+    "install:pnpm-link": "pnpm run build && pnpm link --global",
+    "uninstall:global": "node scripts/uninstall-local-command.mjs",
+    "preflight": "node scripts/audit-repo.mjs",
+    "verify:capabilities": "node scripts/verify-capabilities.mjs",
+    "start:src": "node black-src/cli.mjs",
+    "start": "node dist/blaude.mjs",
+    "blaude": "node dist/blaude.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/bedrock-sdk": "^0.26.4",
+    "@anthropic-ai/foundry-sdk": "^0.2.3",
+    "@anthropic-ai/sdk": "^0.80.0",
+    "@anthropic-ai/vertex-sdk": "^0.14.4"
+  }
+}
