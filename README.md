@@ -17,23 +17,24 @@ Note: building the repo does not automatically place `blaude` on your shell `PAT
 
 ## Current Status
 
-What Blaude already provides:
-
-- independent CLI and interactive TUI
-- `blaude` command entrypoint
-- provider-backed model execution from `settings.json`
-- runtime logs in the UI and on disk
-- slash-command palette with Tab completion
-- `!<command>` shell shortcut mode and `!!` rerun
-- `@file` prompt attachments with path completion
-- shell, file, search, and edit tools
-- simple sub-agent delegation
+| Capability | Status | Notes |
+| --- | --- | --- |
+| Leaked `src/` as runtime core | Implemented | `build` and `start` now bundle and run the leaked `src/` tree instead of `black-src`. |
+| Official `@anthropic-ai/claude-code` runtime dependency | Removed | `pnpm run audit:runtime` verifies the runnable path no longer depends on the official package. |
+| Built runtime startup | Verified | `pnpm run build`, `pnpm start -- -v`, and `node dist/blaude.mjs --help` pass. |
+| Source-mode startup | Verified | `pnpm run start:src -- -v` passes against the leaked source tree. |
+| Third-party provider settings | Wired | `settings.json`-based provider wiring is present, but ongoing end-to-end regression is still needed after the `src` migration. |
+| Interactive TUI | Available, still being hardened | The active CLI/TUI now comes from leaked `src` code plus compatibility layers; not every interaction path has been exhaustively regression-tested yet. |
+| Slash commands and CLI surface | Present | The leaked command surface is exposed again; individual commands are not all fully validated yet. |
+| Tool loop and agent runtime | Present, still being filled out | Core loop is running from leaked `src` with supplemental modules and shims. |
+| MCP / plugins / hooks / IDE bridge / LSP | Partial | Interfaces and command surface exist in `src`, but full parity is not complete. |
+| Performance parity with latest Claude Code | In progress | Functional startup is back on leaked `src`, but latency, streaming, and large-session behavior still need work. |
 
 What it is not:
 
 - not a byte-for-byte rebuild of the leaked Claude Code source snapshot
 - not yet full parity with the latest official Claude Code
-- not dependent on the official Claude Code npm package
+- not dependent on the official Claude Code npm package as the active runtime
 
 For parity gaps and roadmap, see [BLACK_CODE_PARITY_GAP.md](./BLACK_CODE_PARITY_GAP.md).
 
