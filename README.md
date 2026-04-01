@@ -38,6 +38,29 @@ What it is not:
 
 For parity gaps and roadmap, see [BLACK_CODE_PARITY_GAP.md](./BLACK_CODE_PARITY_GAP.md).
 
+## Capability Mapping From The Original Checklist
+
+The image-based checklist used during the recovery effort describes an idealized "all core modules loaded" state. The table below is the current, honest restatement for this repository today.
+
+| Checklist Item | Current Status | Current Reality In This Repo |
+| --- | --- | --- |
+| 26 built-in tools | Partial | The leaked `src/` tool surface is present again and the runtime can start from `src`, but the old "26 tools fully end-to-end verified" claim has not been fully re-established after the `src` migration. |
+| `QueryEngine` | Present | [`src/QueryEngine.ts`](./src/QueryEngine.ts) is back on the active runtime path and now bundles into the shipped `dist` output. |
+| `query()` | Present | [`src/query.ts`](./src/query.ts) exports `async function* query(...)` again and is part of the leaked-source execution path. |
+| API client | Wired, needs broader regression | The `src` API layer is active again, and third-party provider wiring remains in place, but full streaming/provider regression is still ongoing. |
+| `toolToAPISchema` / schema conversion | Present | `toolToAPISchema` and Zod-to-JSON-Schema conversion still exist in leaked `src` and are on the active code path. |
+| Bash tool | Present, not fully re-benchmarked | Shell execution support is present in leaked `src`, but the old end-to-end benchmark claim from the image has not been fully re-run in the current branch. |
+| Read tool | Present, not fully re-benchmarked | File-read paths are present in leaked `src`; offset/limit style behavior still needs broader regression coverage after the migration. |
+| Glob tool | Present, not fully re-benchmarked | File enumeration/search code is present in leaked `src`, but the original image's dedicated validation has not been fully repeated. |
+| Grep tool | Present, not fully re-benchmarked | Search code paths are present in leaked `src`, but the previous "fully validated" status is not yet re-signed-off here. |
+| Complete agent loop | Partial | The active runtime now comes from leaked `src`, and the agent/query loop is back on the live path, but the prior multi-turn benchmark should be re-run before claiming full parity. |
+| Context management | Present, needs hardening | `autocompact`, `microcompact`, and `snip` related source paths exist again in leaked `src`; ongoing runtime hardening is still needed. |
+| Message system | Present | `createUserMessage`, normalization, and related message plumbing are present in leaked `src`. |
+| MCP support | Partial | MCP client/server/auth code is present in leaked `src`, but full production-grade parity and regression coverage are not complete. |
+| Session / history | Present | Session/history state remains wired with on-disk state under `.claude/blaude/`; JSONL-related helpers also exist in leaked `src`. |
+| Permissions system | Present, needs more verification | `canUseTool` and permission-related runtime code are back on the leaked-source path, but not every permission flow has been exhaustively re-tested. |
+| Code scale | Current snapshot, not a fixed target | Current tree is about `2017` files under `src`, about `34M` source, about `94M` built `dist`, and current `pnpm run build` passes with warnings but no build errors. |
+
 ## Requirements
 
 - macOS or Linux
