@@ -1,6 +1,10 @@
 import type { QuerySource } from '../../constants/querySource.js'
 import type { ToolUseContext } from '../../Tool.js'
 import type { AssistantMessage, Message } from '../../types/message.js'
+import { trimMessagesToTargetTokens } from '../../compat/messageWindowing.js'
+import { getContextWindowForModel } from '../../utils/context.js'
+import { extractTextContent } from '../../utils/messages.js'
+import { tokenCountWithEstimation } from '../../utils/tokens.js'
 
 type Listener = () => void
 
@@ -69,20 +73,71 @@ export async function applyCollapsesIfNeeded(
   _toolUseContext: ToolUseContext,
   _querySource: QuerySource,
 ): Promise<{ messages: Message[] }> {
-  return { messages }
+  if (!isContextCollapseEnabled()) {
+    return { messages }
+  }
+
+  const model = _toolUseContext.options.mainLoopModel
+  const contextWindow = getContextWindowForModel(model)
+  const triggerTokens = Math.floor(contextWindow * 0.9)
+  const targetTokens = Math.floor(contextWindow * 0.72)
+  const result = trimMessagesToTargetTokens(messages, targetTokens, {
+    minKeepMessages: 20,
+  })
+
+  if (result.beforeTokens < triggerTokens || result.removed === 0) {
+    return { messages }
+  }
+
+  stats = {
+    ...stats,
+    collapsedSpans: stats.collapsedSpans + 1,
+    collapsedMessages: stats.collapsedMessages + result.removed,
+  }
+  notify()
+  return { messages: result.messages }
 }
 
 export function recoverFromOverflow(
   messages: Message[],
   _querySource: QuerySource,
 ): { messages: Message[]; committed: number } {
-  return { messages, committed: 0 }
+  if (!isContextCollapseEnabled()) {
+    return { messages, committed: 0 }
+  }
+
+  const result = trimMessagesToTargetTokens(messages, 64_000, {
+    minKeepMessages: 12,
+  })
+  if (result.removed === 0) {
+    return { messages, committed: 0 }
+  }
+
+  stats = {
+    ...stats,
+    collapsedSpans: stats.collapsedSpans + 1,
+    stagedSpans: stats.stagedSpans + 1,
+    collapsedMessages: stats.collapsedMessages + result.removed,
+  }
+  notify()
+
+  return { messages: result.messages, committed: result.removed }
 }
 
 export function isWithheldPromptTooLong(
-  _message: AssistantMessage,
-  _isPromptTooLongMessage: (message: string) => boolean,
+  message: Message,
+  isPromptTooLongMessage: (message: AssistantMessage) => boolean,
   _querySource: QuerySource,
 ): boolean {
-  return false
+  if (!isContextCollapseEnabled()) {
+    return false
+  }
+  if (message.type !== 'assistant') {
+    return false
+  }
+  if (isPromptTooLongMessage(message)) {
+    return true
+  }
+  const text = extractTextContent(message.message.content, '\n').trim()
+  return text.toLowerCase().includes('prompt is too long')
 }

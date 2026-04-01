@@ -491,6 +491,7 @@ export async function runHeadless(
     setSDKStatus?: (status: SDKStatus) => void
   },
 ): Promise<void> {
+  logForDebugging('[HEADLESS] runHeadless() entered')
   if (
     process.env.USER_TYPE === 'ant' &&
     isEnvTruthy(process.env.CLAUDE_CODE_EXIT_AFTER_FIRST_RENDER)
@@ -585,6 +586,7 @@ export async function runHeadless(
   }
 
   const structuredIO = getStructuredIO(inputPrompt, options)
+  logForDebugging('[HEADLESS] StructuredIO created')
 
   // When emitting NDJSON for SDK clients, any stray write to stdout (debug
   // prints, dependency console.log, library banners) breaks the client's
@@ -616,12 +618,25 @@ export async function runHeadless(
     // Initialize sandbox with a callback that forwards network permission
     // requests to the SDK host via the can_use_tool control_request protocol.
     // This must happen after structuredIO is created so we can send requests.
-    try {
-      await SandboxManager.initialize(structuredIO.createSandboxAskCallback())
-    } catch (err) {
-      process.stderr.write(`\n❌ Sandbox Error: ${errorMessage(err)}\n`)
-      gracefulShutdownSync(1, 'other')
-      return
+    const sandboxAskCallback = structuredIO.createSandboxAskCallback()
+    const initializeSandbox = async () => {
+      logForDebugging('[HEADLESS] Initializing sandbox...')
+      await SandboxManager.initialize(sandboxAskCallback)
+      logForDebugging('[HEADLESS] Sandbox initialized')
+    }
+    if (SandboxManager.isSandboxRequired()) {
+      try {
+        await initializeSandbox()
+      } catch (err) {
+        process.stderr.write(`\n❌ Sandbox Error: ${errorMessage(err)}\n`)
+        gracefulShutdownSync(1, 'other')
+        return
+      }
+    } else {
+      void initializeSandbox().catch(err => {
+        process.stderr.write(`\n❌ Sandbox Error: ${errorMessage(err)}\n`)
+        gracefulShutdownSync(1, 'other')
+      })
     }
   }
 
@@ -674,10 +689,13 @@ export async function runHeadless(
   }
 
   if (options.setupTrigger) {
+    logForDebugging(`[HEADLESS] Running setup hooks for trigger=${options.setupTrigger}`)
     await processSetupHooks(options.setupTrigger)
+    logForDebugging('[HEADLESS] Setup hooks completed')
   }
 
   headlessProfilerCheckpoint('before_loadInitialMessages')
+  logForDebugging('[HEADLESS] Loading initial messages...')
   const appState = getAppState()
   const {
     messages: initialMessages,
@@ -693,6 +711,7 @@ export async function runHeadless(
     sessionStartHooksPromise: options.sessionStartHooksPromise,
     restoredWorkerState: structuredIO.restoredWorkerState,
   })
+  logForDebugging(`[HEADLESS] Initial messages loaded: ${initialMessages.length}`)
 
   // SessionStart hooks can emit initialUserMessage — the first user turn for
   // headless orchestrator sessions where stdin is empty and additionalContext
@@ -838,7 +857,9 @@ export async function runHeadless(
 
   // Ensure model strings are initialized before generating model options.
   // For Bedrock users, this waits for the profile fetch to get correct region strings.
+  logForDebugging('[HEADLESS] Ensuring model strings are initialized...')
   await ensureModelStringsInitialized()
+  logForDebugging('[HEADLESS] Model strings ready')
   headlessProfilerCheckpoint('after_modelStrings')
 
   // UDS inbox store registration is deferred until after `run` is defined
@@ -861,6 +882,7 @@ export async function runHeadless(
       : null
 
   headlessProfilerCheckpoint('before_runHeadlessStreaming')
+  logForDebugging('[HEADLESS] Starting runHeadlessStreaming loop...')
   for await (const message of runHeadlessStreaming(
     structuredIO,
     appState.mcp.clients,
@@ -1867,6 +1889,7 @@ function runHeadlessStreaming(
       return
     }
 
+    logForDebugging('[HEADLESS] run() entered')
     running = true
     runPhase = undefined
     notifySessionStateChanged('running')
@@ -1876,6 +1899,7 @@ function runHeadlessStreaming(
     // TODO(custom-tool-refactor): Should move to the init message, like browser
 
     await updateSdkMcp()
+    logForDebugging('[HEADLESS] SDK MCP state updated')
     headlessProfilerCheckpoint('after_updateSdkMcp')
 
     // Resolve deferred plugin installation (CLAUDE_CODE_SYNC_PLUGIN_INSTALL).
@@ -1884,6 +1908,7 @@ function runHeadlessStreaming(
     // If CLAUDE_CODE_SYNC_PLUGIN_INSTALL_TIMEOUT_MS is set, races against that
     // deadline and proceeds without plugins on timeout (logging an error).
     if (pluginInstallPromise) {
+      logForDebugging('[HEADLESS] Waiting for synchronous plugin installation...')
       const timeoutMs = parseInt(
         process.env.CLAUDE_CODE_SYNC_PLUGIN_INSTALL_TIMEOUT_MS || '',
         10,
@@ -1908,6 +1933,7 @@ function runHeadlessStreaming(
 
       // Refresh commands, agents, and hooks now that plugins are installed
       await refreshPluginState()
+      logForDebugging('[HEADLESS] Plugin state refreshed after install')
 
       // Set up hot-reload for plugin hooks now that the initial install is done.
       // In sync-install mode, setup.ts skips this to avoid racing with the install.
@@ -2143,6 +2169,7 @@ function runHeadlessStreaming(
           // const-capture: TS loses `while ((command = dequeue()))` narrowing
           // inside the closure.
           const cmd = command
+          logForDebugging(`[HEADLESS] Starting ask() for command mode=${cmd.mode} uuid=${cmd.uuid ?? 'none'}`)
           await runWithWorkload(cmd.workload ?? options.workload, async () => {
             for await (const message of ask({
               commands: uniqBy(
@@ -4058,6 +4085,7 @@ function runHeadlessStreaming(
 
       // First prompt message implicitly initializes if not already done.
       initialized = true
+      logForDebugging(`[HEADLESS] Received user message uuid=${message.uuid ?? 'none'}`)
 
       // Check for duplicate user message - skip if already processed
       if (message.uuid) {
@@ -4107,6 +4135,7 @@ function runHeadlessStreaming(
         uuid: message.uuid,
         priority: message.priority,
       })
+      logForDebugging('[HEADLESS] User message enqueued; kicking run()')
       // Increment prompt count for attribution tracking and save snapshot
       // The snapshot persists promptCount so it survives compaction
       if (feature('COMMIT_ATTRIBUTION')) {

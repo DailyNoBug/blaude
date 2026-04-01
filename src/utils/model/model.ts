@@ -416,18 +416,18 @@ export function renderModelName(model: ModelName): string {
 
 /**
  * Returns a safe author name for public display (e.g., in git commit trailers).
- * Returns "Claude {ModelName}" for publicly known models, or "Claude ({model})"
+ * Returns "Blaude {ModelName}" for publicly known models, or "Blaude ({model})"
  * for unknown/internal models so the exact model name is preserved.
  *
  * @param model The full model name
- * @returns "Claude {ModelName}" for public models, or "Claude ({model})" for non-public models
+ * @returns "Blaude {ModelName}" for public models, or "Blaude ({model})" for non-public models
  */
 export function getPublicModelName(model: ModelName): string {
   const publicName = getPublicModelDisplayName(model)
   if (publicName) {
-    return `Claude ${publicName}`
+    return `Blaude ${publicName}`
   }
-  return `Claude (${model})`
+  return `Blaude (${model})`
 }
 
 /**
@@ -598,16 +598,16 @@ export function getMarketingNameForModel(modelId: string): string | undefined {
     return has1m ? 'Sonnet 4 (with 1M context)' : 'Sonnet 4'
   }
   if (canonical.includes('claude-3-7-sonnet')) {
-    return 'Claude 3.7 Sonnet'
+    return 'Blaude 3.7 Sonnet'
   }
   if (canonical.includes('claude-3-5-sonnet')) {
-    return 'Claude 3.5 Sonnet'
+    return 'Blaude 3.5 Sonnet'
   }
   if (canonical.includes('claude-haiku-4-5')) {
     return 'Haiku 4.5'
   }
   if (canonical.includes('claude-3-5-haiku')) {
-    return 'Claude 3.5 Haiku'
+    return 'Blaude 3.5 Haiku'
   }
 
   return undefined

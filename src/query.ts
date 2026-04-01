@@ -797,28 +797,30 @@ async function* queryLoop(
             // tree-shaking constraint), so the collapse check is nested
             // rather than composed.
             let withheld = false
-            if (feature('CONTEXT_COLLAPSE')) {
+            if (message.type === 'assistant') {
+              if (feature('CONTEXT_COLLAPSE')) {
+                if (
+                  contextCollapse?.isWithheldPromptTooLong(
+                    message,
+                    isPromptTooLongMessage,
+                    querySource,
+                  )
+                ) {
+                  withheld = true
+                }
+              }
+              if (reactiveCompact?.isWithheldPromptTooLong(message)) {
+                withheld = true
+              }
               if (
-                contextCollapse?.isWithheldPromptTooLong(
-                  message,
-                  isPromptTooLongMessage,
-                  querySource,
-                )
+                mediaRecoveryEnabled &&
+                reactiveCompact?.isWithheldMediaSizeError(message)
               ) {
                 withheld = true
               }
-            }
-            if (reactiveCompact?.isWithheldPromptTooLong(message)) {
-              withheld = true
-            }
-            if (
-              mediaRecoveryEnabled &&
-              reactiveCompact?.isWithheldMediaSizeError(message)
-            ) {
-              withheld = true
-            }
-            if (isWithheldMaxOutputTokens(message)) {
-              withheld = true
+              if (isWithheldMaxOutputTokens(message)) {
+                withheld = true
+              }
             }
             if (!withheld) {
               yield yieldMessage
@@ -954,6 +956,16 @@ async function* queryLoop(
       }
     } catch (error) {
       logError(error)
+      if (error instanceof Error) {
+        logForDebugging(
+          `[query] unexpected error: ${error.stack ?? error.message}`,
+          { level: 'error' },
+        )
+      } else {
+        logForDebugging(`[query] unexpected non-error: ${String(error)}`, {
+          level: 'error',
+        })
+      }
       const errorMessage =
         error instanceof Error ? error.message : String(error)
       logEvent('tengu_query_error', {

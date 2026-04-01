@@ -2402,6 +2402,17 @@ async function* queryModel(
         responseHeaders = resp.headers
       }
     } catch (streamingError) {
+      if (streamingError instanceof Error) {
+        logForDebugging(
+          `[api:stream] streaming error stack: ${streamingError.stack ?? streamingError.message}`,
+          { level: 'error' },
+        )
+      } else {
+        logForDebugging(
+          `[api:stream] streaming non-error: ${String(streamingError)}`,
+          { level: 'error' },
+        )
+      }
       // Clear the idle timeout watchdog on error path too
       clearStreamIdleTimers()
 
@@ -2596,6 +2607,17 @@ async function* queryModel(
       clearStreamIdleTimers()
     }
   } catch (errorFromRetry) {
+    if (errorFromRetry instanceof Error) {
+      logForDebugging(
+        `[api:retry] request error stack: ${errorFromRetry.stack ?? errorFromRetry.message}`,
+        { level: 'error' },
+      )
+    } else {
+      logForDebugging(
+        `[api:retry] request non-error: ${String(errorFromRetry)}`,
+        { level: 'error' },
+      )
+    }
     // FallbackTriggeredError must propagate to query.ts, which performs the
     // actual model switch. Swallowing it here would turn the fallback into a
     // no-op — the user would just see "Model fallback triggered: X -> Y" as

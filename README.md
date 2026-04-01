@@ -15,6 +15,24 @@ blaude
 
 Note: building the repo does not automatically place `blaude` on your shell `PATH`. Run the install step below once to register the command.
 
+## One-Step Install
+
+The fastest path is the repo-root install script. It installs dependencies, builds the leaked-`src` runtime, creates a release tarball in `.artifacts/`, and installs `blaude`.
+
+```bash
+cd /path/to/claude-code
+./install.sh
+```
+
+Useful variants:
+
+```bash
+./install.sh --bin-dir "$HOME/.local/bin"
+./install.sh --skip-deps
+./install.sh --tarball-install
+pnpm run install:all
+```
+
 ## Current Status
 
 | Capability | Status | Notes |

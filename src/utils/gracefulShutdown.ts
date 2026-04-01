@@ -57,7 +57,7 @@ import { profileReport } from './startupProfiler.js'
  */
 /* eslint-disable custom-rules/no-sync-fs -- must be sync to flush before process.exit */
 function cleanupTerminalModes(): void {
-  if (!process.stdout.isTTY) {
+  if (!process.stdout.isTTY || !getIsInteractive()) {
     return
   }
 
@@ -173,7 +173,7 @@ function printResumeHint(): void {
       writeSync(
         1,
         chalk.dim(
-          `\nResume this session with:\nclaude --resume ${resumeArg}\n`,
+          `\nResume this session with:\nblaude --resume ${resumeArg}\n`,
         ),
       )
       resumeHintPrinted = true
