@@ -105,9 +105,12 @@ export function _resetTmuxControlModeProbeForTesting(): void {
 }
 
 /**
- * Runtime env-var check only. Ants default to on (CLAUDE_CODE_NO_FLICKER=0
- * to opt out); external users default to off (CLAUDE_CODE_NO_FLICKER=1 to
- * opt in).
+ * Runtime env-var check only.
+ *
+ * Blaude defaults to fullscreen/virtualized scrollback on, matching the
+ * post-2.1.88 Claude Code experience. `CLAUDE_CODE_NO_FLICKER=0` opts out;
+ * `CLAUDE_CODE_NO_FLICKER=1` remains an explicit override when callers want
+ * to force it on.
  */
 export function isFullscreenEnvEnabled(): boolean {
   // Explicit user opt-out always wins.
@@ -125,7 +128,7 @@ export function isFullscreenEnvEnabled(): boolean {
     }
     return false
   }
-  return process.env.USER_TYPE === 'ant'
+  return true
 }
 
 /**
