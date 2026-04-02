@@ -7,6 +7,7 @@ import { clearClassifierApprovals } from '../../utils/classifierApprovals.js'
 import { resetGetMemoryFilesCache } from '../../utils/claudemd.js'
 import { clearSessionMessagesCache } from '../../utils/sessionStorage.js'
 import { clearBetaTracingState } from '../../utils/telemetry/betaSessionTracing.js'
+import { closeOpenLspFiles } from '../lsp/manager.js'
 import { resetMicrocompactState } from './microCompact.js'
 
 /**
@@ -29,6 +30,7 @@ import { resetMicrocompactState } from './microCompact.js'
  * genuinely main-thread-only (/compact, /clear).
  */
 export function runPostCompactCleanup(querySource?: QuerySource): void {
+  void closeOpenLspFiles().catch(() => {})
   // Subagents (agent:*) run in the same process and share module-level
   // state with the main thread. Only reset main-thread module-level state
   // (context-collapse, memory file cache) for main-thread compacts.

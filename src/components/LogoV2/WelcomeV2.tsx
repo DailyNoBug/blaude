@@ -12,17 +12,25 @@ type ArtSegment = {
 
 type ArtLine = readonly ArtSegment[]
 
-const GUIDE_DOG_ART: readonly ArtLine[] = [
-  [{ text: '                  /v---------------v\\', color: 'clawd_body' }],
-  [{ text: '                 V    o       o    V', color: 'clawd_body' }],
-  [{ text: '                  \\      ^      /', color: 'clawd_body' }],
+const HAJIMI_ART: readonly ArtLine[] = [
+  [{ text: '                  .-^^^^^^^^-._', color: 'claude' }],
+  [{ text: '               .-"   .----.    "-.', color: 'claude' }],
+  [{ text: "             .'    .'      `.      `.", color: 'claude' }],
+  [{ text: "            /    .'  .--.    `.      \\\\", color: 'claude' }],
   [
-    { text: '                   |    ', color: 'clawd_body' },
-    { text: '[ ]', color: 'permission' },
-    { text: '    |', color: 'clawd_body' },
+    { text: '           /    /   / ', color: 'claude' },
+    { text: 'OO', color: 'permission' },
+    { text: ' \\     \\      \\\\', color: 'claude' },
   ],
-  [{ text: '                  /|___________|\\', color: 'clawd_body' }],
-  [{ text: '                 /_/           \\_\\', color: 'clawd_body' }],
+  [{ text: '          ;    ;    \\____/      ;     ;', color: 'claude' }],
+  [{ text: "          |    |       /\\       |     |", color: 'claude' }],
+  [{ text: "          |    |     .'  `.     |     |", color: 'clawd_body' }],
+  [{ text: "          ;    ;   .' ____ `.   ;     ;", color: 'clawd_body' }],
+  [{ text: "           \\    \\ /  / __ \\  \\ /     /", color: 'clawd_body' }],
+  [{ text: "            `.   |  | /  \\ |  |   .'", color: 'clawd_body' }],
+  [{ text: "              `-.\\  \\____/  /.-' ", color: 'clawd_body' }],
+  [{ text: "                  `-..__..-'", color: 'claude' }],
+  [{ text: '                hajimi stare mode', color: 'permission' }],
 ]
 
 function renderArtLine(line: ArtLine, lineIndex: number): React.ReactNode {
@@ -50,7 +58,7 @@ export function WelcomeV2(): React.ReactNode {
       </Text>
       <Text>{'…'.repeat(WELCOME_V2_WIDTH)}</Text>
       <Text>{' '}</Text>
-      {GUIDE_DOG_ART.map(renderArtLine)}
+      {HAJIMI_ART.map(renderArtLine)}
       <Text>{' '}</Text>
     </Box>
   )

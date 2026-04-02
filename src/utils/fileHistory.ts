@@ -11,11 +11,14 @@ import {
   unlink,
 } from 'fs/promises'
 import { dirname, isAbsolute, join, relative } from 'path'
+import { pathToFileURL } from 'url'
 import {
   getIsNonInteractiveSession,
   getOriginalCwd,
   getSessionId,
 } from 'src/bootstrap/state.js'
+import { clearDeliveredDiagnosticsForFile } from 'src/services/lsp/LSPDiagnosticRegistry.js'
+import { getLspServerManager } from 'src/services/lsp/manager.js'
 import { logEvent } from 'src/services/analytics/index.js'
 import { notifyVscodeFileUpdated } from 'src/services/mcp/vscodeSdkMcp.js'
 import type { LogOption } from 'src/types/logs.js'
@@ -29,6 +32,11 @@ import { logError } from './log.js'
 import { recordFileHistorySnapshot } from './sessionStorage.js'
 
 type BackupFileName = string | null // The null value means the file does not exist in this version
+type FileRewindChange = {
+  filePath: string
+  oldContent: string | null
+  newContent: string | null
+}
 
 export type FileHistoryBackup = {
   backupFileName: BackupFileName
@@ -379,12 +387,13 @@ export async function fileHistoryRewind(
     logForDebugging(
       `FileHistory: [Rewind] Rewinding to snapshot for ${messageId}`,
     )
-    const filesChanged = await applySnapshot(captured, targetSnapshot)
+    const rewindChanges = await applySnapshot(captured, targetSnapshot)
+    await syncRewindChangesToIntegrations(rewindChanges)
 
     logForDebugging(`FileHistory: [Rewind] Finished rewinding to ${messageId}`)
     logEvent('tengu_file_history_rewind_success', {
       trackedFilesCount: captured.trackedFiles.size,
-      filesChangedCount: filesChanged.length,
+      filesChangedCount: rewindChanges.length,
     })
   } catch (error) {
     logError(error)
@@ -537,11 +546,12 @@ export async function fileHistoryHasAnyChanges(
 async function applySnapshot(
   state: FileHistoryState,
   targetSnapshot: FileHistorySnapshot,
-): Promise<string[]> {
-  const filesChanged: string[] = []
+): Promise<FileRewindChange[]> {
+  const filesChanged: FileRewindChange[] = []
   for (const trackingPath of state.trackedFiles) {
     try {
       const filePath = maybeExpandFilePath(trackingPath)
+      const oldContent = await readFileAsyncOrNull(filePath)
       const targetBackup = targetSnapshot.trackedFileBackups[trackingPath]
 
       const backupFileName: BackupFileName | undefined = targetBackup
@@ -564,7 +574,11 @@ async function applySnapshot(
         try {
           await unlink(filePath)
           logForDebugging(`FileHistory: [Rewind] Deleted ${filePath}`)
-          filesChanged.push(filePath)
+          filesChanged.push({
+            filePath,
+            oldContent,
+            newContent: null,
+          })
         } catch (e: unknown) {
           if (!isENOENT(e)) throw e
           // Already absent; nothing to do.
@@ -575,10 +589,15 @@ async function applySnapshot(
       // File should exist at a specific version. Restore only if it differs.
       if (await checkOriginFileChanged(filePath, backupFileName)) {
         await restoreBackup(filePath, backupFileName)
+        const newContent = await readFileAsyncOrNull(filePath)
         logForDebugging(
           `FileHistory: [Rewind] Restored ${filePath} from ${backupFileName}`,
         )
-        filesChanged.push(filePath)
+        filesChanged.push({
+          filePath,
+          oldContent,
+          newContent,
+        })
       }
     } catch (error) {
       logError(error)
@@ -588,6 +607,40 @@ async function applySnapshot(
     }
   }
   return filesChanged
+}
+
+async function syncRewindChangesToIntegrations(
+  changes: FileRewindChange[],
+): Promise<void> {
+  if (changes.length === 0) {
+    return
+  }
+
+  const lspManager = getLspServerManager()
+
+  await Promise.all(
+    changes.map(async ({ filePath, oldContent, newContent }) => {
+      clearDeliveredDiagnosticsForFile(pathToFileURL(filePath).href)
+
+      if (lspManager?.isFileOpen(filePath)) {
+        try {
+          if (newContent === null) {
+            await lspManager.closeFile(filePath)
+          } else {
+            await lspManager.changeFile(filePath, newContent)
+            await lspManager.saveFile(filePath)
+          }
+        } catch (error) {
+          logForDebugging(
+            `LSP: Failed to sync rewind for ${filePath}: ${getErrnoCode(error) ?? String(error)}`,
+          )
+          logError(error)
+        }
+      }
+
+      notifyVscodeFileUpdated(filePath, oldContent, newContent)
+    }),
+  )
 }
 
 /**

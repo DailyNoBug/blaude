@@ -110,6 +110,17 @@ export function isLspConnected(): boolean {
 }
 
 /**
+ * Close files currently kept open in the singleton LSP manager.
+ * Used when conversation context is truncated or reset (compact/rewind/clear)
+ * so stale didOpen state does not linger in language servers.
+ */
+export async function closeOpenLspFiles(filePaths?: string[]): Promise<void> {
+  const manager = getLspServerManager()
+  if (!manager) return
+  await manager.closeOpenFiles(filePaths)
+}
+
+/**
  * Wait for LSP server manager initialization to complete.
  *
  * Returns immediately if initialization has already completed (success or failure).

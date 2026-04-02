@@ -212,6 +212,7 @@ import { SessionBackgroundHint } from '../components/SessionBackgroundHint.js';
 import { startBackgroundSession } from '../tasks/LocalMainSessionTask.js';
 import { useSessionBackgrounding } from '../hooks/useSessionBackgrounding.js';
 import { diagnosticTracker } from '../services/diagnosticTracking.js';
+import { closeOpenLspFiles } from '../services/lsp/manager.js';
 import { handleSpeculationAccept, type ActiveSpeculationState } from '../services/PromptSuggestion/speculation.js';
 import { IdeOnboardingDialog } from '../components/IdeOnboardingDialog.js';
 import { EffortCallout, shouldShowEffortCallout } from '../components/EffortCallout.js';
@@ -3669,6 +3670,7 @@ export function REPL({
       rewindToMessageIndex: messageIndex
     });
     setMessages(prev.slice(0, messageIndex));
+    void closeOpenLspFiles().catch(() => {});
     // Careful, this has to happen after setMessages
     setConversationId(randomUUID());
     // Reset cached microcompact state so stale pinned cache edits

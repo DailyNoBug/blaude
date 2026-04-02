@@ -91,18 +91,6 @@ export function createLSPServerInstance(
   name: string,
   config: ScopedLspServerConfig,
 ): LSPServerInstance {
-  // Validate that unimplemented fields are not set
-  if (config.restartOnCrash !== undefined) {
-    throw new Error(
-      `LSP server '${name}': restartOnCrash is not yet implemented. Remove this field from the configuration.`,
-    )
-  }
-  if (config.shutdownTimeout !== undefined) {
-    throw new Error(
-      `LSP server '${name}': shutdownTimeout is not yet implemented. Remove this field from the configuration.`,
-    )
-  }
-
   // Private state encapsulated via closures. Lazy-require LSPClient so
   // vscode-jsonrpc (~129KB) only loads when an LSP server is actually
   // instantiated, not when the static import chain reaches this module.
@@ -115,6 +103,7 @@ export function createLSPServerInstance(
   let lastError: Error | undefined
   let restartCount = 0
   let crashRecoveryCount = 0
+  let autoRestartPromise: Promise<void> | undefined
   // Propagate crash state so ensureServerStarted can restart on next use.
   // Without this, state stays 'running' after crash and the server is never
   // restarted (zombie state).
@@ -122,6 +111,19 @@ export function createLSPServerInstance(
     state = 'error'
     lastError = error
     crashRecoveryCount++
+    if (config.restartOnCrash) {
+      autoRestartPromise ??= start()
+        .catch(restartError => {
+          logError(
+            new Error(
+              `LSP server '${name}' auto-restart failed: ${errorMessage(restartError)}`,
+            ),
+          )
+        })
+        .finally(() => {
+          autoRestartPromise = undefined
+        })
+    }
   })
 
   /**
@@ -133,6 +135,9 @@ export function createLSPServerInstance(
    * @throws {Error} If server fails to start or initialize
    */
   async function start(): Promise<void> {
+    if (autoRestartPromise) {
+      return autoRestartPromise
+    }
     if (state === 'running' || state === 'starting') {
       return
     }
@@ -278,7 +283,16 @@ export function createLSPServerInstance(
 
     try {
       state = 'stopping'
-      await client.stop()
+      const stopPromise = client.stop()
+      if (config.shutdownTimeout !== undefined) {
+        await withTimeout(
+          stopPromise,
+          config.shutdownTimeout,
+          `LSP server '${name}' timed out after ${config.shutdownTimeout}ms during shutdown`,
+        )
+      } else {
+        await stopPromise
+      }
       state = 'stopped'
       logForDebugging(`LSP server instance stopped: ${name}`)
     } catch (error) {

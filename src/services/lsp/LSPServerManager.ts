@@ -1,5 +1,5 @@
 import * as path from 'path'
-import { pathToFileURL } from 'url'
+import { fileURLToPath, pathToFileURL } from 'url'
 import { logForDebugging } from '../../utils/debug.js'
 import { errorMessage } from '../../utils/errors.js'
 import { logError } from '../../utils/log.js'
@@ -38,6 +38,8 @@ export type LSPServerManager = {
   saveFile(filePath: string): Promise<void>
   /** Synchronize file close to LSP server (sends didClose notification) */
   closeFile(filePath: string): Promise<void>
+  /** Close all currently-open files, or a provided subset, in LSP servers */
+  closeOpenFiles(filePaths?: string[]): Promise<void>
   /** Check if a file is already open on a compatible LSP server */
   isFileOpen(filePath: string): boolean
 }
@@ -399,6 +401,48 @@ export function createLSPServerManager(): LSPServerManager {
     }
   }
 
+  async function closeOpenFiles(filePaths?: string[]): Promise<void> {
+    const requested = filePaths
+      ? new Set(filePaths.map(filePath => path.resolve(filePath)))
+      : null
+
+    const openFilePaths = Array.from(openedFiles.keys())
+      .map(uri => {
+        try {
+          return fileURLToPath(uri)
+        } catch {
+          return null
+        }
+      })
+      .filter((filePath): filePath is string => filePath !== null)
+      .filter(filePath =>
+        requested ? requested.has(path.resolve(filePath)) : true,
+      )
+
+    const uniqueOpenFilePaths = Array.from(new Set(openFilePaths))
+    if (uniqueOpenFilePaths.length === 0) {
+      return
+    }
+
+    const results = await Promise.allSettled(
+      uniqueOpenFilePaths.map(filePath => closeFile(filePath)),
+    )
+
+    const errors = results
+      .map((result, index) =>
+        result.status === 'rejected'
+          ? `${uniqueOpenFilePaths[index]}: ${errorMessage(result.reason)}`
+          : null,
+      )
+      .filter((error): error is string => error !== null)
+
+    if (errors.length > 0) {
+      throw new Error(
+        `Failed to close ${errors.length} LSP open file(s): ${errors.join('; ')}`,
+      )
+    }
+  }
+
   function isFileOpen(filePath: string): boolean {
     const fileUri = pathToFileURL(path.resolve(filePath)).href
     return openedFiles.has(fileUri)
@@ -415,6 +459,7 @@ export function createLSPServerManager(): LSPServerManager {
     changeFile,
     saveFile,
     closeFile,
+    closeOpenFiles,
     isFileOpen,
   }
 }
