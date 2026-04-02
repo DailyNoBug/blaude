@@ -8,6 +8,7 @@ import { getGrowthBookClientKey } from '../../constants/keys.js'
 import {
   checkHasTrustDialogAccepted,
   getGlobalConfig,
+  peekGlobalConfig,
   saveGlobalConfig,
 } from '../../utils/config.js'
 import { logForDebugging } from '../../utils/debug.js'
@@ -417,11 +418,39 @@ function syncRemoteEvalToDisk(): void {
 }
 
 /**
- * Check if GrowthBook operations should be enabled
+ * GrowthBook-backed feature flags remain readable from local overrides/cache,
+ * but Blaude does not perform remote feature-flag fetches anymore.
  */
 function isGrowthBookEnabled(): boolean {
-  // GrowthBook depends on 1P event logging.
-  return is1PEventLoggingEnabled()
+  return true
+}
+
+function isGrowthBookNetworkEnabled(): boolean {
+  return false
+}
+
+function getCachedGrowthBookValue<T>(feature: string): T | undefined {
+  try {
+    const cached = peekGlobalConfig()?.cachedGrowthBookFeatures?.[feature]
+    return cached as T | undefined
+  } catch {
+    return undefined
+  }
+}
+
+function getCachedStatsigGate(gate: string): boolean | undefined {
+  try {
+    const config = peekGlobalConfig()
+    if (!config) return undefined
+    const gbCached = config.cachedGrowthBookFeatures?.[gate]
+    if (gbCached !== undefined) {
+      return Boolean(gbCached)
+    }
+    const statsigCached = config.cachedStatsigGates?.[gate]
+    return statsigCached !== undefined ? Boolean(statsigCached) : undefined
+  } catch {
+    return undefined
+  }
 }
 
 /**
@@ -489,7 +518,7 @@ function getUserAttributes(): GrowthBookUserAttributes {
  */
 const getGrowthBookClient = memoize(
   (): { client: GrowthBook; initialized: Promise<void> } | null => {
-    if (!isGrowthBookEnabled()) {
+    if (!isGrowthBookEnabled() || !isGrowthBookNetworkEnabled()) {
       return null
     }
 
@@ -686,6 +715,11 @@ async function getFeatureValueInternal<T>(
     return defaultValue
   }
 
+  if (!isGrowthBookNetworkEnabled()) {
+    const cached = getCachedGrowthBookValue<T>(feature)
+    return cached !== undefined ? cached : defaultValue
+  }
+
   const growthBookClient = await initializeGrowthBook()
   if (!growthBookClient) {
     return defaultValue
@@ -749,13 +783,6 @@ export function getFeatureValue_CACHED_MAY_BE_STALE<T>(
     return defaultValue
   }
 
-  // Log experiment exposure if data is available, otherwise defer until after init
-  if (experimentDataByFeature.has(feature)) {
-    logExposureForFeature(feature)
-  } else {
-    pendingExposures.add(feature)
-  }
-
   // In-memory payload is authoritative once processRemoteEvalPayload has run.
   // Disk is also fresh by then (syncRemoteEvalToDisk runs synchronously inside
   // init), so this is correctness-equivalent to the disk read below — but it
@@ -766,12 +793,8 @@ export function getFeatureValue_CACHED_MAY_BE_STALE<T>(
   }
 
   // Fall back to disk cache (survives across process restarts)
-  try {
-    const cached = getGlobalConfig().cachedGrowthBookFeatures?.[feature]
-    return cached !== undefined ? (cached as T) : defaultValue
-  } catch {
-    return defaultValue
-  }
+  const cached = getCachedGrowthBookValue<T>(feature)
+  return cached !== undefined ? cached : defaultValue
 }
 
 /**
@@ -818,22 +841,7 @@ export function checkStatsigFeatureGate_CACHED_MAY_BE_STALE(
     return false
   }
 
-  // Log experiment exposure if data is available, otherwise defer until after init
-  if (experimentDataByFeature.has(gate)) {
-    logExposureForFeature(gate)
-  } else {
-    pendingExposures.add(gate)
-  }
-
-  // Return cached value immediately from disk
-  // First check GrowthBook cache, then fall back to Statsig cache for migration
-  const config = getGlobalConfig()
-  const gbCached = config.cachedGrowthBookFeatures?.[gate]
-  if (gbCached !== undefined) {
-    return Boolean(gbCached)
-  }
-  // Fallback to Statsig cache for migration period
-  return config.cachedStatsigGates?.[gate] ?? false
+  return getCachedStatsigGate(gate) ?? false
 }
 
 /**
@@ -865,27 +873,7 @@ export async function checkSecurityRestrictionGate(
     return false
   }
 
-  // If re-initialization is in progress, wait for it to complete
-  // This ensures we get fresh values after auth changes
-  if (reinitializingPromise) {
-    await reinitializingPromise
-  }
-
-  // Check Statsig cache first - it may have correct value from previous logged-in session
-  const config = getGlobalConfig()
-  const statsigCached = config.cachedStatsigGates?.[gate]
-  if (statsigCached !== undefined) {
-    return Boolean(statsigCached)
-  }
-
-  // Then check GrowthBook cache
-  const gbCached = config.cachedGrowthBookFeatures?.[gate]
-  if (gbCached !== undefined) {
-    return Boolean(gbCached)
-  }
-
-  // No cache - return false (don't block on init for uncached gates)
-  return false
+  return getCachedStatsigGate(gate) ?? false
 }
 
 /**
@@ -918,20 +906,7 @@ export async function checkGate_CACHED_OR_BLOCKING(
     return false
   }
 
-  // Fast path: disk cache already says true — trust it
-  const cached = getGlobalConfig().cachedGrowthBookFeatures?.[gate]
-  if (cached === true) {
-    // Log experiment exposure if data is available, otherwise defer
-    if (experimentDataByFeature.has(gate)) {
-      logExposureForFeature(gate)
-    } else {
-      pendingExposures.add(gate)
-    }
-    return true
-  }
-
-  // Slow path: disk says false/missing — may be stale, fetch fresh
-  return getFeatureValueInternal(gate, false, true)
+  return getCachedStatsigGate(gate) ?? false
 }
 
 /**
@@ -941,7 +916,7 @@ export async function checkGate_CACHED_OR_BLOCKING(
  * apiHostRequestHeaders cannot be updated after client creation.
  */
 export function refreshGrowthBookAfterAuthChange(): void {
-  if (!isGrowthBookEnabled()) {
+  if (!isGrowthBookEnabled() || !isGrowthBookNetworkEnabled()) {
     return
   }
 
@@ -1025,7 +1000,7 @@ let beforeExitListener: (() => void) | null = null
  * this preserves client state and just fetches fresh feature values.
  */
 export async function refreshGrowthBookFeatures(): Promise<void> {
-  if (!isGrowthBookEnabled()) {
+  if (!isGrowthBookEnabled() || !isGrowthBookNetworkEnabled()) {
     return
   }
 
@@ -1085,7 +1060,7 @@ export async function refreshGrowthBookFeatures(): Promise<void> {
  * feature values stay fresh. Matches Statsig's 6-hour refresh interval.
  */
 export function setupPeriodicGrowthBookRefresh(): void {
-  if (!isGrowthBookEnabled()) {
+  if (!isGrowthBookEnabled() || !isGrowthBookNetworkEnabled()) {
     return
   }
 

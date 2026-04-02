@@ -5,7 +5,6 @@ import { getCwd } from './cwd.js'
 import { logForDebugging } from './debug.js'
 import { execSync_DEPRECATED } from './execSyncWrapper.js'
 import { memoizeWithLRU } from './memoize.js'
-import { getPlatform } from './platform.js'
 
 /**
  * Check if a file or directory exists on Windows using the dir command
@@ -85,7 +84,11 @@ function findExecutable(executable: string): string | null {
  * COMSPEC is left unchanged for system process execution.
  */
 export function setShellIfWindows(): void {
-  if (getPlatform() === 'windows') {
+  // Keep this check dependency-free: init.ts calls it on every startup, and
+  // we only care about native Windows here, not higher-level platform
+  // classification (macOS/WSL/Linux). Avoiding getPlatform() also keeps this
+  // path out of the broader platform-detection import graph.
+  if (process.platform === 'win32') {
     const gitBashPath = findGitBashPath()
     process.env.SHELL = gitBashPath
     logForDebugging(`Using bash path: "${gitBashPath}"`)

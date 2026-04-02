@@ -1086,6 +1086,17 @@ export function getGlobalConfig(): GlobalConfig {
 }
 
 /**
+ * Fast non-blocking peek at the in-memory global config cache.
+ * Returns null until getGlobalConfig()/saveGlobalConfig() has populated it.
+ */
+export function peekGlobalConfig(): GlobalConfig | null {
+  if (process.env.NODE_ENV === 'test') {
+    return TEST_GLOBAL_CONFIG_FOR_TESTING
+  }
+  return globalConfigCache.config
+}
+
+/**
  * Returns the effective value of remoteControlAtStartup. Precedence:
  *   1. User's explicit config value (always wins — honors opt-out)
  *   2. CCR auto-connect default (ant-only build, GrowthBook-gated)

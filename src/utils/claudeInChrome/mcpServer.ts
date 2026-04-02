@@ -6,14 +6,6 @@ import {
 } from '@ant/claude-for-chrome-mcp'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { format } from 'util'
-import { shutdownDatadog } from '../../services/analytics/datadog.js'
-import { shutdown1PEventLogging } from '../../services/analytics/firstPartyEventLogger.js'
-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../services/analytics/growthbook.js'
-import {
-  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
-  logEvent,
-} from '../../services/analytics/index.js'
-import { initializeAnalyticsSink } from '../../services/analytics/sink.js'
 import { getClaudeAIOAuthTokens } from '../auth.js'
 import { enableConfigs, getGlobalConfig, saveGlobalConfig } from '../config.js'
 import { logForDebugging } from '../debug.js'
@@ -24,14 +16,6 @@ import { getAllSocketPaths, getSecureSocketPath } from './common.js'
 const EXTENSION_DOWNLOAD_URL = 'https://claude.ai/chrome'
 const BUG_REPORT_URL =
   'https://github.com/anthropics/claude-code/issues/new?labels=bug,claude-in-chrome'
-
-// String metadata keys safe to forward to analytics. Keys like error_message
-// are excluded because they could contain page content or user data.
-const SAFE_BRIDGE_STRING_KEYS = new Set([
-  'bridge_status',
-  'error_type',
-  'tool_name',
-])
 
 const PERMISSION_MODES: readonly PermissionMode[] = [
   'ask',
@@ -44,14 +28,11 @@ function isPermissionMode(raw: string): raw is PermissionMode {
 }
 
 /**
- * Resolves the Chrome bridge URL based on environment and feature flag.
- * Bridge is used when the feature flag is enabled; ant users always get
- * bridge. API key / 3P users fall back to native messaging.
+ * Resolves the Chrome bridge URL based on environment.
+ * Bridge is used for ant users; API key / 3P users fall back to native messaging.
  */
 function getChromeBridgeUrl(): string | undefined {
-  const bridgeEnabled =
-    process.env.USER_TYPE === 'ant' ||
-    getFeatureValue_CACHED_MAY_BE_STALE('tengu_copper_bridge', false)
+  const bridgeEnabled = process.env.USER_TYPE === 'ant'
 
   if (!bridgeEnabled) {
     return undefined
@@ -215,54 +196,23 @@ export function createChromeContext(
         }
       },
     }),
-    trackEvent: (eventName, metadata) => {
-      const safeMetadata: {
-        [key: string]:
-          | boolean
-          | number
-          | AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS
-          | undefined
-      } = {}
-      if (metadata) {
-        for (const [key, value] of Object.entries(metadata)) {
-          // Rename 'status' to 'bridge_status' to avoid Datadog's reserved field
-          const safeKey = key === 'status' ? 'bridge_status' : key
-          if (typeof value === 'boolean' || typeof value === 'number') {
-            safeMetadata[safeKey] = value
-          } else if (
-            typeof value === 'string' &&
-            SAFE_BRIDGE_STRING_KEYS.has(safeKey)
-          ) {
-            // Only forward allowlisted string keys — fields like error_message
-            // could contain page content or user data
-            safeMetadata[safeKey] =
-              value as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS
-          }
-        }
-      }
-      logEvent(eventName, safeMetadata)
-    },
   }
 }
 
 export async function runClaudeInChromeMcpServer(): Promise<void> {
   enableConfigs()
-  initializeAnalyticsSink()
   const context = createChromeContext()
 
   const server = createClaudeForChromeMcpServer(context)
   const transport = new StdioServerTransport()
 
   // Exit when parent process dies (stdin pipe closes).
-  // Flush analytics before exiting so final-batch events (e.g. disconnect) aren't lost.
   let exiting = false
   const shutdownAndExit = async (): Promise<void> => {
     if (exiting) {
       return
     }
     exiting = true
-    await shutdown1PEventLogging()
-    await shutdownDatadog()
     // eslint-disable-next-line custom-rules/no-process-exit
     process.exit(0)
   }
