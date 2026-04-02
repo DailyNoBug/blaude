@@ -1,6 +1,14 @@
 class BaseColorRenderer {
+  constructor(...args) {
+    this.args = args;
+  }
+
   static render(input) {
     return typeof input === "string" ? input : String(input ?? "");
+  }
+
+  render() {
+    return null;
   }
 }
 
