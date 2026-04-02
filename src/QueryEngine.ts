@@ -1009,7 +1009,7 @@ export class QueryEngine {
         )
         const callsThisQuery = currentCalls - initialStructuredOutputCalls
         const maxRetries = parseInt(
-          process.env.MAX_STRUCTURED_OUTPUT_RETRIES || '5',
+          process.env.MAX_STRUCTURED_OUTPUT_RETRIES || '3',
           10,
         )
         if (callsThisQuery >= maxRetries) {

@@ -128,7 +128,7 @@ export const POST_COMPACT_MAX_TOKENS_PER_FILE = 5_000
 // part. Budget sized to hold ~5 skills at the per-skill cap.
 export const POST_COMPACT_MAX_TOKENS_PER_SKILL = 5_000
 export const POST_COMPACT_SKILLS_TOKEN_BUDGET = 25_000
-const MAX_COMPACT_STREAMING_RETRIES = 2
+const MAX_COMPACT_STREAMING_RETRIES = 1
 
 /**
  * Strip image blocks from user messages before sending for compaction.
@@ -224,7 +224,7 @@ export function stripReinjectedAttachments(messages: Message[]): Message[] {
 
 export const ERROR_MESSAGE_NOT_ENOUGH_MESSAGES =
   'Not enough messages to compact.'
-const MAX_PTL_RETRIES = 3
+const MAX_PTL_RETRIES = 2
 const PTL_RETRY_MARKER = '[earlier conversation truncated for compaction retry]'
 
 /**

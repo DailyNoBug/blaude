@@ -4361,6 +4361,16 @@ export function isLoggableMessage(m: Message): boolean {
     ) {
       return true
     }
+    // Preserve tool-deferred, MCP, and agent-listing deltas so that
+    // --resume can reuse the prompt cache instead of rebuilding from
+    // scratch (cache hit ratio drops from ~99% to ~26% without these).
+    if (
+      m.attachment.type === 'deferred_tools_delta' ||
+      m.attachment.type === 'mcp_instructions_delta' ||
+      m.attachment.type === 'agent_listing_delta'
+    ) {
+      return true
+    }
     return false
   }
   return true

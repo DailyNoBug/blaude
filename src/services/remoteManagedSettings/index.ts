@@ -50,7 +50,7 @@ import {
 
 // Constants
 const SETTINGS_TIMEOUT_MS = 10000 // 10 seconds for settings fetch
-const DEFAULT_MAX_RETRIES = 5
+const DEFAULT_MAX_RETRIES = 3
 const POLLING_INTERVAL_MS = 60 * 60 * 1000 // 1 hour
 
 // Background polling state
